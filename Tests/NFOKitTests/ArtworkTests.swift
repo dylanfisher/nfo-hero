@@ -69,3 +69,21 @@ private func folder(with files: [String], _ body: (URL) throws -> Void) throws {
         #expect(try Artwork(nextTo: nfo).fanart?.lastPathComponent == "\(nfoName)-fanart.png")
     }
 }
+
+@Test func ignoresArtworkThatIsNotARegularFile() throws {
+    let elsewhere = FileManager.default.temporaryDirectory
+        .appendingPathComponent(UUID().uuidString + ".jpg")
+    try Data().write(to: elsewhere)
+    defer { try? FileManager.default.removeItem(at: elsewhere) }
+    try folder(with: []) { nfo throws in
+        let folder = nfo.deletingLastPathComponent()
+        try FileManager.default.createSymbolicLink(
+            at: folder.appendingPathComponent("poster.jpg"), withDestinationURL: elsewhere)
+        try FileManager.default.createDirectory(
+            at: folder.appendingPathComponent("fanart.jpg"), withIntermediateDirectories: false)
+        #expect(mkfifo(folder.appendingPathComponent("folder.jpg").path, 0o600) == 0)
+        let artwork = try Artwork(nextTo: nfo)
+        #expect(artwork.poster == nil)
+        #expect(artwork.fanart == nil)
+    }
+}

@@ -6,7 +6,8 @@ public struct Artwork: Sendable, Equatable {
 
     /// The first of `<name>-poster`, `poster`, `folder` and `cover` with a `.jpg`, `.jpeg` or
     /// `.png` extension in the NFO's folder, where `<name>` is the NFO's filename without its
-    /// extension. Matching ignores case.
+    /// extension. Matching ignores case. Only regular files count, not symbolic links, so the
+    /// image is always the one in the folder and never a file elsewhere on the disk.
     public var poster: URL?
     /// Like ``poster``, for `<name>-fanart` and `fanart`.
     public var fanart: URL?
@@ -23,12 +24,17 @@ public struct Artwork: Sendable, Equatable {
         let wanted = Set(posterNames + fanartNames)
 
         let files = try fileManager.contentsOfDirectory(
-            at: nfoURL.deletingLastPathComponent(), includingPropertiesForKeys: nil
+            at: nfoURL.deletingLastPathComponent(), includingPropertiesForKeys: [.isRegularFileKey]
         )
         var byName: [String: URL] = [:]
         for file in files {
             let name = file.lastPathComponent.lowercased()
-            if wanted.contains(name) { byName[name] = file }
+            // A downloaded folder can hold a poster.jpg that links to any file the user can read,
+            // or a FIFO or device that never finishes reading. isRegularFile does not follow links.
+            guard wanted.contains(name),
+                try file.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true
+            else { continue }
+            byName[name] = file
         }
         poster = posterNames.lazy.compactMap { byName[$0] }.first
         fanart = fanartNames.lazy.compactMap { byName[$0] }.first
