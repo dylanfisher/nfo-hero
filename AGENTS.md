@@ -10,7 +10,7 @@ Instructions for AI coding agents working in this repo. Humans: see [README.md](
 - **Package manager:** Swift Package Manager — no Xcode project
 - **Framework:** SwiftUI `DocumentGroup(viewing:)`, AppKit `NSTextView` for the text
 - **Test framework:** Swift Testing (`import Testing`)
-- **Layout:** `Sources/NFOKit` (pure logic), `Sources/NFOUI` (views), `Sources/NFOHero` (the app), `Sources/NFOQuickLook` (Quick Look extension), `Tests/NFOKitTests` — tiers and search recipes: [docs/map.md](docs/map.md)
+- **Layout:** `Sources/NFOKit` (pure logic), `Sources/NFOUI` (views), `Sources/NFOHero` (the app), `Sources/NFOQuickLook` and `Sources/NFOThumbnail` (Quick Look extensions), `Tests/NFOKitTests` — tiers and search recipes: [docs/map.md](docs/map.md)
 
 ## Commands
 

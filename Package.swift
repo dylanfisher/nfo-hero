@@ -9,6 +9,7 @@ let package = Package(
     products: [
         .executable(name: "NFOHero", targets: ["NFOHero"]),
         .executable(name: "NFOQuickLook", targets: ["NFOQuickLook"]),
+        .executable(name: "NFOThumbnail", targets: ["NFOThumbnail"]),
     ],
     targets: [
         .target(name: "NFOKit", swiftSettings: strict),
@@ -21,6 +22,13 @@ let package = Package(
         // never runs here, and they read as zero.
         .executableTarget(
             name: "NFOQuickLook",
+            dependencies: ["NFOUI"],
+            swiftSettings: strict + [.unsafeFlags(["-parse-as-library"])],
+            linkerSettings: [.unsafeFlags(["-Xlinker", "-e", "-Xlinker", "_NSExtensionMain"])]
+        ),
+        // The Quick Look thumbnail extension, built the same way.
+        .executableTarget(
+            name: "NFOThumbnail",
             dependencies: ["NFOUI"],
             swiftSettings: strict + [.unsafeFlags(["-parse-as-library"])],
             linkerSettings: [.unsafeFlags(["-Xlinker", "-e", "-Xlinker", "_NSExtensionMain"])]

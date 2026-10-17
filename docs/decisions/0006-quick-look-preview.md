@@ -49,7 +49,7 @@ A view-based preview extension, `NFOQuickLook.appex`, inside the app's `Contents
 - **A `main.swift` that calls `NSExtensionMain`** — rejected: it would declare a private
   Foundation function by hand through `@_silgen_name`, where the linker flag uses the exported
   symbol as is.
-- **A thumbnail extension** — not done yet. Finder shows the generic document icon.
+- **A thumbnail extension** — not done here; added in [0010](0010-finder-thumbnails.md).
 
 ## Consequences
 

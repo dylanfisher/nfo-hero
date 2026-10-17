@@ -7,8 +7,8 @@ media, shown as an info card with the folder's `poster.jpg` and the file's video
 subtitle streams, and release NFOs with their DOS ASCII art intact and their BBCode drawn as bold
 and colored text. **View → Text Encoding** picks UTF-8, DOS or Windows-1252 when the detected one
 is wrong, and **View → Dark Text Background** draws the art light on dark. Press space on an NFO
-in Finder for the same view in Quick Look. It never writes to your files and makes no network
-calls.
+in Finder for the same view in Quick Look, and Finder's icons show the top of a release NFO's art. It never
+writes to your files and makes no network calls.
 
 Requires macOS 15 or later.
 
@@ -34,9 +34,10 @@ tests. It runs every step and lists every failure. CI runs the same command.
 | `Sources/NFOUI/` | The SwiftUI and AppKit views that show an NFO. |
 | `Sources/NFOHero/` | The app: document type, window and menus. |
 | `Sources/NFOQuickLook/` | The Quick Look preview extension. |
+| `Sources/NFOThumbnail/` | The Quick Look thumbnail extension, for Finder's icons. |
 | `Tests/NFOKitTests/` | Swift Testing suite, with real NFO files in `Fixtures/`. |
 | `Resources/Info.plist` | Bundle ID, version and file types — the only place they're defined. |
-| `Resources/QuickLook-Info.plist` | The extension's own keys; `scripts/bundle` adds the ID, version and type from `Info.plist`. |
+| `Resources/QuickLook-Info.plist`, `Resources/Thumbnail-Info.plist` | Each extension's own keys; `scripts/bundle` adds the ID, version and type from `Info.plist`. |
 | `AGENTS.md` | Instructions for coding agents. |
 | `docs/map.md` | Where things live and how to find them. |
 | `docs/writing.md` | Comment voice and commit format. |

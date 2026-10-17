@@ -21,24 +21,24 @@ against a codebase you haven't searched.
 | a helper | `rg 'func <name>' --type swift Sources/` |
 | a parsing, decoding or detection rule | `ls Sources/NFOKit/` |
 | a view | `rg 'View(Representable)?\b' --type swift Sources/NFOUI/` |
-| a bundle value (ID, version, file types) | `plutil -p Resources/Info.plist` — the only place they live; `scripts/bundle` copies them into the extension's |
+| a bundle value (ID, version, file types) | `plutil -p Resources/Info.plist` — the only place they live; `scripts/bundle` copies them into the extensions' |
 
 If a search turns up something close but not identical, that's the second occurrence. Use it or
 duplicate it — do not abstract yet (principle 3).
 
 ## Tiers
 
-Four SwiftPM targets: two executables that share the ui tier. The dependency direction is one-way:
-**app → ui → kit** and **extension → ui → kit**.
+Five SwiftPM targets: three executables, the app and two Quick Look extensions, that share the ui
+tier. The dependency direction is one-way: **app → ui → kit** and **extension → ui → kit**.
 
 | Tier | Path | What belongs here | May import from |
 |---|---|---|---|
 | **kit** | `Sources/NFOKit` | Turning an NFO's bytes into something to show: XML-vs-scene detection, Kodi XML parsing, CP437/UTF-8 decoding, BBCode conversion, artwork lookup. Pure and tested. | `Foundation` only |
-| **ui** | `Sources/NFOUI` | The views that show an NFO: info cards, the `NSTextView` wrapper, artwork decoding. Only `NFODocumentView` and what the menu needs are public. | kit, Apple frameworks |
+| **ui** | `Sources/NFOUI` | The views that show an NFO: info cards, the `NSTextView` wrapper and its text style, artwork decoding, the Finder thumbnail's drawing. Only `NFODocumentView`, `NFOThumbnail` and what the menu needs are public. | kit, Apple frameworks |
 | **app** | `Sources/NFOHero` | `@main`, the `DocumentGroup`, the document type, menu commands, the window's Show Raw and Text Encoding state. | ui, kit, Apple frameworks |
-| **extension** | `Sources/NFOQuickLook` | The Quick Look preview's view controller. Sandboxed, so it cannot read the NFO's folder ([0006](decisions/0006-quick-look-preview.md)). | ui, kit, Apple frameworks |
+| **extension** | `Sources/NFOQuickLook`, `Sources/NFOThumbnail` | The Quick Look preview's view controller and the Finder thumbnail's provider. Sandboxed, so they cannot read the NFO's folder ([0006](decisions/0006-quick-look-preview.md), [0010](decisions/0010-finder-thumbnails.md)). | ui, kit, Apple frameworks |
 
-SwiftPM's target graph stops kit importing ui, ui importing app or extension, and the two
+SwiftPM's target graph stops kit importing ui, ui importing app or extension, and the
 executables importing each other. `scripts/arch`, run
 by `./scripts/check`, fails if kit imports anything but `Foundation` — that is what keeps it
 testable without the UI. Logic that can be tested without a window goes in kit, even when only one
@@ -62,6 +62,6 @@ The ui, app and extension tiers have no test target.
 
 A promotion is its own commit, separate from whatever work revealed it (principle 4).
 
-<!-- paths: Sources/NFOKit Sources/NFOUI Sources/NFOHero Sources/NFOQuickLook -->
+<!-- paths: Sources/NFOKit Sources/NFOUI Sources/NFOHero Sources/NFOQuickLook Sources/NFOThumbnail -->
 <!-- ↑ scripts/check verifies every path above exists. Keep it in sync with the Tiers table;
      a rename that misses this line fails the gate, which is the point. -->

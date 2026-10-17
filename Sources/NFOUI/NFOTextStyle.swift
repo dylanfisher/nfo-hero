@@ -1,7 +1,8 @@
 import AppKit
 import NFOKit
 
-/// How NFO text is drawn: the font, the line height and the BBCode styles.
+/// How NFO text is drawn: the font, the line height and the BBCode styles. Shared by the text view
+/// and the Finder thumbnail, which draws off the main thread.
 enum NFOTextStyle {
     // The fonts and paragraph style are `nonisolated(unsafe)` because AppKit does not mark them
     // Sendable, although they are immutable and documented as safe to share between threads.

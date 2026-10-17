@@ -1,22 +1,29 @@
 #!/usr/bin/env bash
-# Build NFOHero and its Quick Look extension and wrap them in
-# dist/<CFBundleName>.app, ad-hoc signed with the hardened runtime. Prints the
+# Build NFOHero and its Quick Look preview and thumbnail extensions and wrap them
+# in dist/<CFBundleName>.app, ad-hoc signed with the hardened runtime. Prints the
 # app's path on stdout; build output goes to stderr. Pass `release` for an
 # optimized build.
 #
 # Resources/Info.plist is the source for the bundle's name, ID, version and file
-# types. The minimum macOS version comes from Package.swift and is copied in here.
-# The extension's Info.plist holds only what is its own; the ID, version, minimum
-# macOS and the NFO type it previews are copied from the app's.
+# types, and names the document icon, which scripts/document-icon.swift draws. The minimum macOS version comes from Package.swift and is copied in here.
+# Each extension's Info.plist holds only what is its own; the ID, version, minimum
+# macOS and the NFO type it handles are copied from the app's.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 config="${1:-debug}"
 plist=Resources/Info.plist
-appex_plist=Resources/QuickLook-Info.plist
+# Each extension's Info.plist and the suffix of its bundle ID.
+extensions=(
+  "Resources/QuickLook-Info.plist .QuickLook"
+  "Resources/Thumbnail-Info.plist .Thumbnail"
+)
 
 swift build -c "$config" --product NFOHero >&2
-swift build -c "$config" --product NFOQuickLook >&2
+for extension in "${extensions[@]}"; do
+  read -r appex_plist _ <<< "$extension"
+  swift build -c "$config" --product "$(plutil -extract CFBundleExecutable raw "$appex_plist")" >&2
+done
 bin_dir="$(swift build -c "$config" --show-bin-path)"
 min_macos=$(swift package describe --type json | plutil -extract platforms.0.version raw -)
 
@@ -27,27 +34,45 @@ cp "$plist" "$app/Contents/Info.plist"
 plutil -replace LSMinimumSystemVersion -string "$min_macos" "$app/Contents/Info.plist"
 cp "$bin_dir/$(plutil -extract CFBundleExecutable raw "$plist")" "$app/Contents/MacOS/"
 
-appex="$app/Contents/PlugIns/$(plutil -extract CFBundleExecutable raw "$appex_plist").appex"
-mkdir -p "$appex/Contents/MacOS"
-cp "$appex_plist" "$appex/Contents/Info.plist"
-for key in CFBundleShortVersionString CFBundleVersion; do
-  plutil -replace "$key" -string "$(plutil -extract "$key" raw "$plist")" "$appex/Contents/Info.plist"
-done
-plutil -replace CFBundleIdentifier \
-  -string "$(plutil -extract CFBundleIdentifier raw "$plist").QuickLook" "$appex/Contents/Info.plist"
-plutil -replace LSMinimumSystemVersion -string "$min_macos" "$appex/Contents/Info.plist"
-plutil -replace NSExtension.NSExtensionAttributes.QLSupportedContentTypes \
-  -json "[\"$(plutil -extract UTImportedTypeDeclarations.0.UTTypeIdentifier raw "$plist")\"]" \
-  "$appex/Contents/Info.plist"
-cp "$bin_dir/$(plutil -extract CFBundleExecutable raw "$appex_plist")" "$appex/Contents/MacOS/"
+# The document type names the icon. The type declaration gets it too, because
+# Finder and Quick Look look up an imported type's icon there.
+icon=$(plutil -extract CFBundleDocumentTypes.0.CFBundleTypeIconFile raw "$plist")
+plutil -replace UTImportedTypeDeclarations.0.UTTypeIconFile -string "$icon" "$app/Contents/Info.plist"
+# Drawn again only when the script changes, since it takes a second.
+icon_dir=.build/document-icon
+if [ ! -e "$icon_dir/$icon.icns" ] || [ scripts/document-icon.swift -nt "$icon_dir/$icon.icns" ]; then
+  rm -rf "$icon_dir"
+  swift scripts/document-icon.swift "$icon_dir/$icon.iconset" >&2
+  iconutil -c icns "$icon_dir/$icon.iconset" -o "$icon_dir/$icon.icns"
+fi
+mkdir -p "$app/Contents/Resources"
+cp "$icon_dir/$icon.icns" "$app/Contents/Resources/"
 
-# Inside out: the app's signature covers the extension's, so the extension is
-# signed first. Quick Look extensions must run in App Sandbox, which the
-# entitlements file turns on with nothing else granted. The app keeps the
-# hardened runtime with no entitlements: no App Sandbox (see
+for extension in "${extensions[@]}"; do
+  read -r appex_plist id_suffix <<< "$extension"
+  appex="$app/Contents/PlugIns/$(plutil -extract CFBundleExecutable raw "$appex_plist").appex"
+  mkdir -p "$appex/Contents/MacOS"
+  cp "$appex_plist" "$appex/Contents/Info.plist"
+  for key in CFBundleShortVersionString CFBundleVersion; do
+    plutil -replace "$key" -string "$(plutil -extract "$key" raw "$plist")" "$appex/Contents/Info.plist"
+  done
+  plutil -replace CFBundleIdentifier \
+    -string "$(plutil -extract CFBundleIdentifier raw "$plist")$id_suffix" "$appex/Contents/Info.plist"
+  plutil -replace LSMinimumSystemVersion -string "$min_macos" "$appex/Contents/Info.plist"
+  plutil -replace NSExtension.NSExtensionAttributes.QLSupportedContentTypes \
+    -json "[\"$(plutil -extract UTImportedTypeDeclarations.0.UTTypeIdentifier raw "$plist")\"]" \
+    "$appex/Contents/Info.plist"
+  cp "$bin_dir/$(plutil -extract CFBundleExecutable raw "$appex_plist")" "$appex/Contents/MacOS/"
+
+  # Inside out: the app's signature covers the extensions', so they are signed
+  # first. Quick Look extensions must run in App Sandbox, which the entitlements
+  # file turns on with nothing else granted.
+  codesign --force --options runtime --entitlements Resources/QuickLook.entitlements \
+    --sign - "$appex" >&2
+done
+
+# The app keeps the hardened runtime with no entitlements: no App Sandbox (see
 # docs/decisions/0004-no-app-sandbox.md) and no network access to grant.
-codesign --force --options runtime --entitlements Resources/QuickLook.entitlements \
-  --sign - "$appex" >&2
 codesign --force --options runtime --sign - "$app" >&2
 
 echo "$app"
