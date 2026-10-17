@@ -126,3 +126,16 @@ private func item(_ name: String) throws -> MediaItem {
     let movie = try #require(NFO.parse(Data(xml.utf8)).mediaItems().first)
     #expect(movie.plot == "Dinosaurs & <chaos>.")
 }
+
+@Test func removesBidirectionalControlsFromCardText() throws {
+    let text = """
+        <movie><title>\u{202E}gnp.exe\u{202C}</title><mpaa>PG\u{2067}</mpaa>\
+        <genre>Drama \u{202D}x\u{2069}</genre><plot>שלום \u{200F}world</plot></movie>
+        """
+    let movie = try #require(NFO.parse(Data(text.utf8)).mediaItems().first)
+    #expect(movie.title == "gnp.exe")
+    #expect(movie.mpaa == "PG")
+    #expect(movie.genres == ["Drama x"])
+    // Marks only set the direction of neutral characters and cannot carry past a field.
+    #expect(movie.plot == "שלום \u{200F}world")
+}

@@ -1,3 +1,5 @@
+import Foundation
+
 /// An XML element with its text and children, built by `XMLTreeBuilder`.
 struct XMLTreeElement: Equatable {
     let name: String
@@ -29,8 +31,17 @@ struct XMLTreeElement: Equatable {
         children(named: name).compactMap(\.trimmedText)
     }
 
+    /// The text without surrounding whitespace or bidirectional embedding, override and isolate
+    /// controls. An override left open in one field reverses the rest of the line the card joins
+    /// it into, such as the genres after the certification, so a file could make the card read
+    /// differently from its contents. The raw view keeps them.
     var trimmedText: String? {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        var scalars = text.unicodeScalars
+        scalars.removeAll { Self.bidiControls.contains($0) }
+        let trimmed = String(scalars).trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? nil : trimmed
     }
+
+    private static let bidiControls = CharacterSet(charactersIn: "\u{202A}"..."\u{202E}")
+        .union(CharacterSet(charactersIn: "\u{2066}"..."\u{2069}"))
 }
