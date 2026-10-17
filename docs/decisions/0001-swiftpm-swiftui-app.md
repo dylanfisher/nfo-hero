@@ -35,6 +35,13 @@ and lint use the toolchain's `swift format`.
 
 Builds, tests and the gate run with only the Command Line Tools. SwiftPM 6.4 on CLT doesn't pass
 Swift Testing's macro plugin path, so `scripts/test` adds it when the folder exists; check whether
-that is still needed after installing Xcode. The CLT also lack the SwiftUI macro plugin, and the macOS 27
-SDK makes `@State` a macro, so views hold `State(initialValue:)` as a plain property instead. Code signing for distribution, notarization and app
-icons will need work in `scripts/bundle` when the app ships.
+that is still needed after installing Xcode.
+
+The macOS 27 SDK makes `@State` and `@Entry` macros from `SwiftUIMacros`, and the CLT ship no
+plugin for that module, so no `-plugin-path` flag can make them build. Views hold
+`State(initialValue:)` as a plain property instead, which SwiftUI finds by reflection like the
+expanded `@State`, and focused values use a hand-written `FocusedValueKey`. Switch to the macros
+once the toolchain has the plugin.
+
+Code signing for distribution, notarization and app icons will need work in `scripts/bundle` when
+the app ships.

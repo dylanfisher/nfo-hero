@@ -26,8 +26,9 @@ is a scene NFO, decoded as UTF-8 when valid and CP437 otherwise. `.diz` files ar
   `musicvideo`, `album`, `artist`) shows as an info card: artwork, title and year, plot, ratings,
   runtime, genres, cast, and show/season/episode for episodes. **View → Show Raw** (⌥⌘U) switches
   to the XML text. Any other XML root opens in the raw view.
-- **Artwork is local only:** `<name>-poster.*`, `poster.*`, `folder.*` or `cover.*` (`.jpg`/`.png`)
-  beside the NFO. With none, the card has no image. `fanart.*` is a candidate card backdrop.
+- **Artwork is local only:** `<name>-poster.*`, `poster.*`, `folder.*` or `cover.*` (`.jpg`,
+  `.jpeg` or `.png`) beside the NFO. With none, the card has no image. `<name>-fanart.*` or
+  `fanart.*` is a faded backdrop behind the cards.
 - **Scene NFOs** show in the unwrapped monospaced text view.
 
 ## Alternatives considered
@@ -49,4 +50,4 @@ carries the parser's line, column and message, so the raw view can say why there
 file that starts with `<` but is not UTF-8 throws instead, because there is no text to show.
 Before parsing, `<?xml ...?>` declarations are removed, anything after the last `>` (Kodi's
 optional scraper URL line) is dropped, and the rest is wrapped in a synthetic root so files with
-several root elements parse. Artwork lookup also accepts `.jpeg`.
+several root elements parse.

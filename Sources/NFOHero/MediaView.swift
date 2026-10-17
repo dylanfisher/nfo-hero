@@ -11,6 +11,7 @@ struct MediaView: View {
     @SceneStorage("showRaw") private var showRaw = false
     // State as a plain property rather than `@State`: in the macOS 27 SDK `@State` is a macro
     // whose plugin ships only with Xcode, so it does not build with the Command Line Tools.
+    // SwiftUI finds `State` properties by reflection, so this keeps its value across updates.
     private let loaded = State(initialValue: LoadedArtwork.none)
     private var artwork: LoadedArtwork { loaded.wrappedValue }
 

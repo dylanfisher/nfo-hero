@@ -26,7 +26,7 @@ tests. It runs every step and lists every failure. CI runs the same command.
 
 | Path | Purpose |
 |---|---|
-| `Sources/NFOKit/` | Detection, parsing and decoding. Imports only Foundation, fully tested. |
+| `Sources/NFOKit/` | Detection, parsing, decoding and artwork lookup. Imports only Foundation, fully tested. |
 | `Sources/NFOHero/` | The SwiftUI app. |
 | `Tests/NFOKitTests/` | Swift Testing suite, with real NFO files in `Fixtures/`. |
 | `Resources/Info.plist` | Bundle ID, version and file types — the only place they're defined. |
