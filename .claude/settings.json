@@ -22,6 +22,8 @@
       "Read(.env.production)",
       "Read(**/*.pem)",
       "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/*.p8)",
       "Edit(.env)",
       "Edit(.env.local)",
       "Edit(.env.*.local)"

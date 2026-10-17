@@ -4,6 +4,9 @@
 !.env.example
 *.pem
 *.key
+# Signing identities and App Store Connect API keys, for when the app is notarized
+*.p12
+*.p8
 
 # Build output
 .build/
