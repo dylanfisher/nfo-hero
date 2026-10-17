@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
-# Build NFOHero and wrap it in dist/<CFBundleName>.app, ad-hoc signed with the
-# hardened runtime. Prints the app's path on stdout; build output goes to
-# stderr. Pass `release` for an optimized build.
+# Build NFOHero and its Quick Look extension and wrap them in
+# dist/<CFBundleName>.app, ad-hoc signed with the hardened runtime. Prints the
+# app's path on stdout; build output goes to stderr. Pass `release` for an
+# optimized build.
 #
 # Resources/Info.plist is the source for the bundle's name, ID, version and file
 # types. The minimum macOS version comes from Package.swift and is copied in here.
+# The extension's Info.plist holds only what is its own; the ID, version, minimum
+# macOS and the NFO type it previews are copied from the app's.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 config="${1:-debug}"
 plist=Resources/Info.plist
+appex_plist=Resources/QuickLook-Info.plist
 
 swift build -c "$config" --product NFOHero >&2
-bin="$(swift build -c "$config" --show-bin-path)/$(plutil -extract CFBundleExecutable raw "$plist")"
+swift build -c "$config" --product NFOQuickLook >&2
+bin_dir="$(swift build -c "$config" --show-bin-path)"
 min_macos=$(swift package describe --type json | plutil -extract platforms.0.version raw -)
 
 app="dist/$(plutil -extract CFBundleName raw "$plist").app"
@@ -20,9 +25,29 @@ rm -rf "$app"
 mkdir -p "$app/Contents/MacOS"
 cp "$plist" "$app/Contents/Info.plist"
 plutil -replace LSMinimumSystemVersion -string "$min_macos" "$app/Contents/Info.plist"
-cp "$bin" "$app/Contents/MacOS/"
-# Hardened runtime, with no entitlements: no App Sandbox (see
+cp "$bin_dir/$(plutil -extract CFBundleExecutable raw "$plist")" "$app/Contents/MacOS/"
+
+appex="$app/Contents/PlugIns/$(plutil -extract CFBundleExecutable raw "$appex_plist").appex"
+mkdir -p "$appex/Contents/MacOS"
+cp "$appex_plist" "$appex/Contents/Info.plist"
+for key in CFBundleShortVersionString CFBundleVersion; do
+  plutil -replace "$key" -string "$(plutil -extract "$key" raw "$plist")" "$appex/Contents/Info.plist"
+done
+plutil -replace CFBundleIdentifier \
+  -string "$(plutil -extract CFBundleIdentifier raw "$plist").QuickLook" "$appex/Contents/Info.plist"
+plutil -replace LSMinimumSystemVersion -string "$min_macos" "$appex/Contents/Info.plist"
+plutil -replace NSExtension.NSExtensionAttributes.QLSupportedContentTypes \
+  -json "[\"$(plutil -extract UTImportedTypeDeclarations.0.UTTypeIdentifier raw "$plist")\"]" \
+  "$appex/Contents/Info.plist"
+cp "$bin_dir/$(plutil -extract CFBundleExecutable raw "$appex_plist")" "$appex/Contents/MacOS/"
+
+# Inside out: the app's signature covers the extension's, so the extension is
+# signed first. Quick Look extensions must run in App Sandbox, which the
+# entitlements file turns on with nothing else granted. The app keeps the
+# hardened runtime with no entitlements: no App Sandbox (see
 # docs/decisions/0004-no-app-sandbox.md) and no network access to grant.
+codesign --force --options runtime --entitlements Resources/QuickLook.entitlements \
+  --sign - "$appex" >&2
 codesign --force --options runtime --sign - "$app" >&2
 
 echo "$app"

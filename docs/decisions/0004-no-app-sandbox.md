@@ -37,6 +37,9 @@ entity expansion or external fetches; files over 16 MB, XML nested more than 256
 past 100 rows are bounded (see `NFO`, `XMLTreeBuilder` and `MediaItem+Formatting`); artwork must
 be a regular file in the NFO's folder and decode as JPEG or PNG.
 
+The Quick Look preview extension is the exception: Quick Look requires its extensions to be
+sandboxed, so it is, and its cards have no artwork ([0006](0006-quick-look-preview.md)).
+
 No network entitlement is granted, and none is needed: the app makes no network calls. If the
 app is ever sandboxed, `com.apple.security.network.client` must stay off. Revisit when shipping
 through the Mac App Store, which requires the sandbox, or if macOS adds a way to grant a

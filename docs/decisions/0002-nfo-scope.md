@@ -39,6 +39,10 @@ is a scene NFO, decoded as UTF-8 when valid and CP437 otherwise. `.diz` files ar
 - **Scene NFOs** show in the unwrapped monospaced text view, with any BBCode drawn as bold,
   italic, underlined and colored text, and Show Raw switching to the source
   ([0005](0005-bbcode-in-scene-nfos.md)).
+- **Quick Look** shows the same views without Show Raw, and info cards there have no artwork: the
+  preview extension is sandboxed and cannot list the NFO's folder
+  ([0006](0006-quick-look-preview.md)). With no file to load, the card leaves no space for a
+  poster.
 
 ## Alternatives considered
 
