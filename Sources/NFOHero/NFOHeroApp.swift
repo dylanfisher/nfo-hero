@@ -1,3 +1,4 @@
+import AppKit
 import NFOKit
 import NFOUI
 import SwiftUI
@@ -8,9 +9,18 @@ struct NFOHeroApp: App {
         DocumentGroup(viewing: NFODocument.self) { file in
             NFOWindowView(nfo: file.document.nfo, fileURL: file.fileURL)
         }
-        .defaultWindowPlacement { _, context in
-            WindowPlacement(
-                size: WindowSize.portrait(fitting: context.defaultDisplay.visibleRect.size))
+        .defaultWindowPlacement { content, context in
+            // The placement's size is the window's frame, so the title bar is added to the
+            // content's ideal size, which the views report from the parsed file.
+            let titleBar = NSWindow.frameRect(
+                forContentRect: .zero, styleMask: [.titled, .closable, .miniaturizable, .resizable]
+            ).size
+            let content = content.sizeThatFits(.unspecified)
+            let ideal = CGSize(
+                width: content.width + titleBar.width, height: content.height + titleBar.height)
+            let size = WindowSize.opening(
+                ideal: ideal, visible: context.defaultDisplay.visibleRect.size)
+            return WindowPlacement(size: size)
         }
         .commands {
             ShowRawCommands()

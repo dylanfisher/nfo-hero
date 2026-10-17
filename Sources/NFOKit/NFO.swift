@@ -40,6 +40,20 @@ public struct NFO: Sendable, Equatable {
     /// after the last element.
     public let text: String
     public let kind: Kind
+    /// The lines of the text a text view shows for the NFO: the text with its BBCode converted for
+    /// a scene NFO that has any, ``text`` otherwise. Measured here because parsing runs off the
+    /// main thread, and the window is sized from it before it opens.
+    public let textExtent: TextExtent
+
+    private init(text: String, kind: Kind) {
+        self.text = text
+        self.kind = kind
+        if case .scene(let bbcode?) = kind {
+            textExtent = TextExtent(measuring: bbcode.text)
+        } else {
+            textExtent = TextExtent(measuring: text)
+        }
+    }
 
     private static let byteOrderMark = Data([0xEF, 0xBB, 0xBF])
 

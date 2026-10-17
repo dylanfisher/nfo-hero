@@ -8,10 +8,6 @@ import SwiftUI
 final class PreviewViewController: NSViewController, QLPreviewingController {
     override func loadView() {
         view = NSView()
-        // With no screen to measure, Quick Look picks the size itself.
-        if let screen = NSScreen.main {
-            preferredContentSize = WindowSize.portrait(fitting: screen.visibleFrame.size)
-        }
     }
 
     /// Quick Look shows a spinner until this returns, so the file is read and parsed off the main
@@ -25,6 +21,12 @@ final class PreviewViewController: NSViewController, QLPreviewingController {
         // read access to the previewed file but not to its folder, and listing it fails.
         let preview = NSHostingView(
             rootView: NFODocumentView(nfo: nfo, fileURL: nil, showRaw: nil))
+        // The hosting view's fitting size is the content's ideal size, which the views report from
+        // the parsed file. With no screen to measure, Quick Look picks the size itself.
+        if let screen = NSScreen.main {
+            preferredContentSize = WindowSize.opening(
+                ideal: preview.fittingSize, visible: screen.visibleFrame.size)
+        }
         preview.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(preview)
         NSLayoutConstraint.activate([

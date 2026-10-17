@@ -6,6 +6,8 @@ import SwiftUI
 struct BBCodeView: View {
     let source: String
     let bbcode: BBCodeText
+    /// The extent of the converted text.
+    let extent: TextExtent
     /// Nil where there is no View → Show Raw.
     let showRaw: Binding<Bool>?
 
@@ -14,7 +16,7 @@ struct BBCodeView: View {
             if showRaw?.wrappedValue == true {
                 NFOTextView(text: source)
             } else {
-                NFOTextView(text: bbcode.text, runs: bbcode.runs)
+                NFOTextView(text: bbcode.text, runs: bbcode.runs, extent: extent)
             }
         }
         .focusedSceneValue(\.showRaw, showRaw.map(ShowRawToggle.init))

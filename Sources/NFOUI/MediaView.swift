@@ -52,15 +52,30 @@ struct MediaView: View {
         }
     }
 
+    private var cardList: some View {
+        ForEach(items.indices, id: \.self) { index in
+            if index > 0 { Divider() }
+            MediaItemView(
+                item: items[index], poster: artwork?.poster ?? .absent,
+                hasShowRaw: showRaw != nil)
+        }
+    }
+
+    /// Up to this many cards are laid out in a plain VStack, which reports their exact height, so
+    /// the window opens fitting them. A LazyVStack estimates the cards it has not built, 9 pt
+    /// short for two or three episodes and 90 pt short for ten, which left a window that
+    /// scrolled. Ten episode cards are taller than most screens, and a window for more opens at
+    /// the fallback size, where the estimate does not matter.
+    private static let eagerCardLimit = 10
+
     private var cards: some View {
         ScrollView {
-            // Lazy so a file with many episodes builds only the cards on screen.
-            LazyVStack(alignment: .leading, spacing: 32) {
-                ForEach(items.indices, id: \.self) { index in
-                    if index > 0 { Divider() }
-                    MediaItemView(
-                        item: items[index], poster: artwork?.poster ?? .absent,
-                        hasShowRaw: showRaw != nil)
+            Group {
+                if items.count <= Self.eagerCardLimit {
+                    VStack(alignment: .leading, spacing: 32) { cardList }
+                } else {
+                    // Lazy so a file with many episodes builds only the cards on screen.
+                    LazyVStack(alignment: .leading, spacing: 32) { cardList }
                 }
             }
             .padding(24)

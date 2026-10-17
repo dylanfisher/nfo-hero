@@ -8,8 +8,16 @@ struct NFOTextView: NSViewRepresentable {
     let text: String
     /// Styles from BBCode. Empty for plain text.
     var runs: [BBCodeText.Run] = []
+    /// The extent of `text`, measured when the file was parsed. With it, the view's ideal size
+    /// fits the whole text without scrolling, which sizes the window it opens in.
+    var extent: TextExtent?
 
     private static let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
+    /// The width of one column. Bold BBCode is drawn in the bold monospaced font, which has the
+    /// same advance, and TextKit draws CP437's box and block characters at it too.
+    private static let advance = font.advancement(forGlyph: font.glyph(withName: "M")).width
+    private static let lineHeight = NSLayoutManager().defaultLineHeight(for: font)
+    private static let lineFragmentPadding = NSTextContainer().lineFragmentPadding
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSTextView.scrollableTextView()
@@ -34,6 +42,26 @@ struct NFOTextView: NSViewRepresentable {
         textView.textContainer?.widthTracksTextView = false
         textView.textContainer?.containerSize = textView.maxSize
         return scrollView
+    }
+
+    /// With an extent, the size that shows the whole text for any dimension that is not proposed.
+    /// Measured from the extent rather than by laying out the text, which for a large file takes
+    /// seconds.
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSScrollView, context: Context)
+        -> CGSize?
+    {
+        guard let extent else { return nil }
+        // Legacy scrollers, shown with a mouse or by the "Show scroll bars: Always" setting, take
+        // space from the text. Overlay scrollers draw over it.
+        let scrollers =
+            NSScroller.preferredScrollerStyle == .legacy
+            ? NSScroller.scrollerWidth(for: .regular, scrollerStyle: .legacy) : 0
+        // The text container pads each line on both sides.
+        let width = CGFloat(extent.longestLine) * Self.advance + 2 * Self.lineFragmentPadding
+        let height = CGFloat(extent.lineCount) * Self.lineHeight
+        return CGSize(
+            width: proposal.width ?? width + scrollers,
+            height: proposal.height ?? height + scrollers)
     }
 
     func updateNSView(_ scrollView: NSScrollView, context: Context) {

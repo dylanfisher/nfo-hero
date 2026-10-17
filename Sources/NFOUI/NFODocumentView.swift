@@ -20,25 +20,29 @@ public struct NFODocumentView: View {
     }
 
     public var body: some View {
-        switch nfo.kind {
-        case .media(let items):
-            MediaView(items: items, text: nfo.text, fileURL: fileURL, showRaw: showRaw)
-        case .scene(let bbcode?):
-            BBCodeView(source: nfo.text, bbcode: bbcode, showRaw: showRaw)
-        case .xml, .scene(nil):
-            NFOTextView(text: nfo.text)
-        case .malformedXML(let error):
-            VStack(spacing: 0) {
-                Label(
-                    "Not valid XML: \(error.description)", systemImage: "exclamationmark.triangle"
-                )
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.yellow.opacity(0.15))
-                .textSelection(.enabled)
-                Divider()
-                NFOTextView(text: nfo.text)
+        IdealSizeLayout {
+            switch nfo.kind {
+            case .media(let items):
+                MediaView(items: items, text: nfo.text, fileURL: fileURL, showRaw: showRaw)
+            case .scene(let bbcode?):
+                BBCodeView(
+                    source: nfo.text, bbcode: bbcode, extent: nfo.textExtent, showRaw: showRaw)
+            case .xml, .scene(nil):
+                NFOTextView(text: nfo.text, extent: nfo.textExtent)
+            case .malformedXML(let error):
+                VStack(spacing: 0) {
+                    Label(
+                        "Not valid XML: \(error.description)",
+                        systemImage: "exclamationmark.triangle"
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.yellow.opacity(0.15))
+                    .textSelection(.enabled)
+                    Divider()
+                    NFOTextView(text: nfo.text, extent: nfo.textExtent)
+                }
             }
         }
     }
