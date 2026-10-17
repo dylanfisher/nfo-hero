@@ -32,7 +32,8 @@ struct MediaView: View {
 
     private var cards: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 32) {
+            // Lazy so a file with many episodes builds only the cards on screen.
+            LazyVStack(alignment: .leading, spacing: 32) {
                 ForEach(items.indices, id: \.self) { index in
                     if index > 0 { Divider() }
                     MediaItemView(item: items[index], poster: artwork.poster)
