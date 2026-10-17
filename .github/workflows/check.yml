@@ -1,11 +1,17 @@
 name: check
 on: [push, pull_request]
+# The job only reads the repository, so the token gets no write access.
+permissions:
+  contents: read
 jobs:
   check:
     # The image's default Xcode supplies Swift. ./scripts/setup fails the run if
     # it doesn't match .swift-version, so a runner update can't change it silently.
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      # Pinned to a commit because a tag can be moved to different code.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
       - run: ./scripts/setup
       - run: ./scripts/check
