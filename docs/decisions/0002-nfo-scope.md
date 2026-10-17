@@ -20,7 +20,8 @@ Jurassic Park (1993) [Remux-2160p] {tmdb=329}.nfo
 ## Decision
 
 Detect the kind per file. A file whose first non-whitespace character is `<` is XML; anything else
-is a scene NFO, decoded as UTF-8 when valid and CP437 otherwise. `.diz` files are scene NFOs.
+is a scene NFO, decoded as UTF-8 when valid and CP437 otherwise
+([0008](0008-dos-text-rendering.md)). `.diz` files are scene NFOs.
 
 - **XML** with a Kodi root (`movie`, `tvshow`, `episodedetails` — possibly several per file,
   `musicvideo`, `album`, `artist`) shows as an info card: artwork, title and year, plot, ratings,

@@ -10,7 +10,7 @@ public struct TextExtent: Sendable, Equatable {
     public let longestLine: Int
 
     /// A tab counts as this many columns. NSTextView's default tab stops are 28 pt apart, so a tab
-    /// advances at most 28 pt, and 4 columns of the 13 pt monospaced font are 32 pt. Counting the
+    /// advances at most 28 pt, and 4 columns of 13 pt Menlo are 31 pt. Counting the
     /// most a tab can take means a line with tabs never measures narrower than it draws.
     static let tabColumns = 4
 

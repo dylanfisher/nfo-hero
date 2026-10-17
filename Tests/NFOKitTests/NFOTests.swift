@@ -59,6 +59,18 @@ import Testing
     #expect(nfo.text == "   ██▓▒░ EXAMPLE ░▒▓██\r\n   ╔══╗\r\n")
 }
 
+@Test func decodesSceneNFOsWithDOSControlGlyphsAsCP437() throws {
+    // Valid UTF-8, but no UTF-8 text contains these controls.
+    #expect(try NFO.parse(Data([0x10, 0x20, 0x41, 0x20, 0x11, 0x0D, 0x0A])).text == "► A ◄\r\n")
+}
+
+@Test func dropsTheSAUCERecordOfASceneNFO() throws {
+    var record = Data("SAUCE00".utf8)
+    record += Data(repeating: 0, count: 128 - record.count)
+    let nfo = try NFO.parse(Data([0xDB, 0xDB, 0xB2, 0x0D, 0x0A, 0x1A]) + record)
+    #expect(nfo.text == "██▓\r\n")
+}
+
 @Test func convertsBBCodeInSceneNFOs() throws {
     let nfo = try NFO.fixture("bbcode-release.nfo")
     #expect(try nfo.bbcode().text.hasPrefix("-----"))

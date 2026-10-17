@@ -58,7 +58,9 @@ public struct NFO: Sendable, Equatable {
     private static let byteOrderMark = Data([0xEF, 0xBB, 0xBF])
 
     /// Detects the kind from the first non-whitespace character: `<` means XML, decoded as
-    /// UTF-8. Anything else is a scene NFO, decoded as UTF-8 when valid and CP437 otherwise.
+    /// UTF-8. Anything else is a scene NFO. Its SAUCE record is dropped, and it is decoded as
+    /// UTF-8 when valid and free of controls other than tab, line feed and carriage return, and
+    /// as CP437 otherwise, since DOS art draws the controls as glyphs.
     ///
     /// Malformed XML does not throw; it comes back as ``Kind/malformedXML(_:)``.
     public static func parse(_ data: Data) throws -> NFO {
@@ -67,7 +69,9 @@ public struct NFO: Sendable, Equatable {
         let firstCharacter = body.first { !isASCIIWhitespace($0) }
 
         guard firstCharacter == UInt8(ascii: "<") else {
-            let text = try String(data: body, encoding: .utf8) ?? CP437.decode(body)
+            let art = SAUCE.removingTrailer(from: body)
+            let utf8 = art.contains(where: isDOSGlyph) ? nil : String(data: art, encoding: .utf8)
+            let text = utf8 ?? CP437.decode(art)
             return NFO(text: text, kind: .scene(BBCodeText(parsing: text)))
         }
 
@@ -81,6 +85,12 @@ public struct NFO: Sendable, Equatable {
         } catch {
             return NFO(text: text, kind: .malformedXML(error))
         }
+    }
+
+    /// A control byte that only CP437 gives a meaning: DOS draws it as a glyph, and no UTF-8 text
+    /// contains it.
+    private static func isDOSGlyph(_ byte: UInt8) -> Bool {
+        (byte < 0x20 && byte != 0x09 && byte != 0x0A && byte != 0x0D) || byte == 0x7F
     }
 
     private static func isASCIIWhitespace(_ byte: UInt8) -> Bool {
