@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# git commit-msg hook: checks the title against docs/writing.md. Installed by
+# ./scripts/setup. The allowed types are read from the table in docs/writing.md.
+set -euo pipefail
+
+title=$(head -n1 "$1")
+case "$title" in "Merge "* | "Revert "* | "fixup! "* | "squash! "*) exit 0 ;; esac
+
+root=$(git rev-parse --show-toplevel)
+types=$(sed -nE 's/^\| `([a-z]+)` \|.*/\1/p' "$root/docs/writing.md" | paste -sd'|' -)
+if [ -z "$types" ]; then
+  echo "commit-msg: no commit types found in docs/writing.md's type table." >&2
+  exit 1
+fi
+
+re="^($types)!?: [a-z0-9].*[^.]$"
+if ! [[ "$title" =~ $re ]]; then
+  echo "commit-msg: title must be '<type>: <summary>' — lowercase, no trailing period." >&2
+  echo "  types: ${types//|/ }" >&2
+  echo "  got:   $title" >&2
+  exit 1
+fi
+if [ "${#title}" -gt 72 ]; then
+  echo "commit-msg: title is ${#title} characters (limit 72)." >&2
+  exit 1
+fi

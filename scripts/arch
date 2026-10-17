@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# NFOKit is the tested core and imports only Foundation, so UI and platform code
+# stays in NFOHero. SwiftPM's target graph already stops NFOKit importing NFOHero;
+# this covers system frameworks, which the graph can't see.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+allowed="Foundation"
+files=$(find Sources/NFOKit -name '*.swift')
+if [ -z "$files" ]; then
+  echo "no Swift files under Sources/NFOKit — this check is not looking where it should." >&2
+  exit 1
+fi
+
+bad=""
+for f in $files; do
+  modules=$(sed -nE 's/^[[:space:]]*(@[A-Za-z_]+[[:space:]]+)*((public|package|internal|fileprivate|private)[[:space:]]+)?import[[:space:]]+((class|struct|enum|protocol|typealias|func|let|var)[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*).*/\6/p' "$f")
+  for m in $modules; do
+    [[ " $allowed " == *" $m "* ]] || bad="$bad
+  $f imports $m"
+  done
+done
+
+if [ -n "$bad" ]; then
+  echo "NFOKit may import only: $allowed$bad" >&2
+  exit 1
+fi
+echo "NFOKit imports only: $allowed"

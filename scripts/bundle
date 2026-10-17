@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Build NFOHero and wrap it in dist/<CFBundleName>.app, ad-hoc signed. Prints the
+# app's path on stdout; build output goes to stderr. Pass `release` for an
+# optimized build.
+#
+# Resources/Info.plist is the source for the bundle's name, ID, version and file
+# types. The minimum macOS version comes from Package.swift and is copied in here.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+config="${1:-debug}"
+plist=Resources/Info.plist
+
+swift build -c "$config" --product NFOHero >&2
+bin="$(swift build -c "$config" --show-bin-path)/$(plutil -extract CFBundleExecutable raw "$plist")"
+min_macos=$(swift package describe --type json | plutil -extract platforms.0.version raw -)
+
+app="dist/$(plutil -extract CFBundleName raw "$plist").app"
+rm -rf "$app"
+mkdir -p "$app/Contents/MacOS"
+cp "$plist" "$app/Contents/Info.plist"
+plutil -replace LSMinimumSystemVersion -string "$min_macos" "$app/Contents/Info.plist"
+cp "$bin" "$app/Contents/MacOS/"
+codesign --force --sign - "$app" >&2
+
+echo "$app"

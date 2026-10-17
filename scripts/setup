@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Get a clean checkout to a runnable state. Must be idempotent.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+chmod +x scripts/*
+
+want=$(cat .swift-version)
+have=$(swift --version 2>&1 | sed -nE 's/.*Swift version ([0-9.]+).*/\1/p')
+if [[ "$have" != "$want" && "$have" != "$want".* ]]; then
+  printf '\033[31m✗ need Swift %s (.swift-version), found %s.\033[0m\n' "$want" "${have:-none}" >&2
+  exit 1
+fi
+
+swift package resolve
+
+hooks=$(git rev-parse --git-path hooks)
+mkdir -p "$hooks"
+ln -sf "$PWD/scripts/commit-msg" "$hooks/commit-msg"
+
+echo "✓ setup complete"

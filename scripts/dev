@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Build the app bundle and open it. The ONE place the run command is written
+# down — AGENTS.md and README point here rather than repeating it. Extra args are
+# files to open, so `./scripts/dev path/to/release.nfo` works.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+app=$(./scripts/bundle)
+exec open -a "$PWD/$app" "$@"

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Run the test suite. Passes through any extra args to `swift test`,
+# so `./scripts/test --filter CP437Tests` works for a focused run.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# SwiftPM 6.4 on Command Line Tools doesn't pass Swift Testing's macro plugin
+# folder to the compiler, so `@Test` fails with "plugin for module
+# 'TestingMacros' not found". Add the folder when the active toolchain has one.
+plugins="$(dirname "$(xcrun --find swift)")/../lib/swift/host/plugins/testing"
+flags=()
+if [ -d "$plugins" ]; then flags=(-Xswiftc -plugin-path -Xswiftc "$plugins"); fi
+
+exec swift test "${flags[@]}" "$@"

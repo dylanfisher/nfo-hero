@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<movie>
+  <title>Jurassic Park</title>
+  <originaltitle>Jurassic Park</originaltitle>
+  <sorttitle>jurassic park</sorttitle>
+  <ratings>
+    <rating name="imdb" max="10" default="true">
+      <value>8.2</value>
+      <votes>1202505</votes>
+    </rating>
+    <rating name="themoviedb" max="10">
+      <value>7.977</value>
+      <votes>18469</votes>
+    </rating>
+    <rating name="tomatometerallcritics" max="100">
+      <value>91</value>
+    </rating>
+  </ratings>
+  <rating>7.977</rating>
+  <criticrating>91</criticrating>
+  <userrating />
+  <top250 />
+  <outline />
+  <plot>A wealthy entrepreneur secretly creates a theme park featuring living dinosaurs drawn from prehistoric DNA. Before opening day, he invites a team of experts and his two eager grandchildren to experience the park and help calm anxious investors. However, the park is anything but amusing as the security systems go off-line and the dinosaurs escape.</plot>
+  <tagline />
+  <runtime>127</runtime>
+  <thumb aspect="poster" preview="https://image.tmdb.org/t/p/original/d9mtMGQDLANKieb9PbD3yK7xxzo.jpg">https://image.tmdb.org/t/p/original/d9mtMGQDLANKieb9PbD3yK7xxzo.jpg</thumb>
+  <fanart>
+    <thumb preview="https://image.tmdb.org/t/p/original/4SyDTF02R5BepqSdQmOaNCHObzF.jpg">https://image.tmdb.org/t/p/original/4SyDTF02R5BepqSdQmOaNCHObzF.jpg</thumb>
+  </fanart>
+  <mpaa>PG-13</mpaa>
+  <playcount />
+  <lastplayed />
+  <id>329</id>
+  <uniqueid type="tmdb" default="true">329</uniqueid>
+  <uniqueid type="imdb">tt0107290</uniqueid>
+  <genre>Adventure</genre>
+  <genre>Science Fiction</genre>
+  <country />
+  <set tmdbcolid="328">
+    <name>Jurassic Park Collection</name>
+    <overview />
+  </set>
+  <status>Released</status>
+  <credits>Michael Crichton</credits>
+  <credits>David Koepp</credits>
+  <director>Steven Spielberg</director>
+  <premiered>1993-06-11</premiered>
+  <year>1993</year>
+  <studio>Universal Pictures</studio>
+  <trailer>plugin://plugin.video.youtube/play/?video_id=bx46tthKXmc</trailer>
+  <watched>false</watched>
+  <fileinfo>
+    <streamdetails>
+      <video>
+        <aspect>1.7777778</aspect>
+        <bitrate>63842284</bitrate>
+        <codec>HEVC</codec>
+        <framerate>23.976023976023976023976023976</framerate>
+        <height>2160</height>
+        <scantype>Progressive</scantype>
+        <width>3840</width>
+        <duration>126.47775</duration>
+        <durationinseconds>7589</durationinseconds>
+        <hdrtype>dolbyvision</hdrtype>
+      </video>
+      <audio>
+        <bitrate>2987142</bitrate>
+        <channels>8</channels>
+        <codec>TrueHD Atmos</codec>
+        <language>engengeng</language>
+      </audio>
+      <subtitle>
+        <language>eng</language>
+      </subtitle>
+      <subtitle>
+        <language>eng</language>
+      </subtitle>
+      <subtitle>
+        <language>alb</language>
+      </subtitle>
+      <subtitle>
+        <language>ara</language>
+      </subtitle>
+      <subtitle>
+        <language>bos</language>
+      </subtitle>
+      <subtitle>
+        <language>bul</language>
+      </subtitle>
+      <subtitle>
+        <language>chi</language>
+      </subtitle>
+      <subtitle>
+        <language>chi</language>
+      </subtitle>
+      <subtitle>
+        <language>chi</language>
+      </subtitle>
+      <subtitle>
+        <language>hrv</language>
+      </subtitle>
+      <subtitle>
+        <language>cze</language>
+      </subtitle>
+      <subtitle>
+        <language>dan</language>
+      </subtitle>
+      <subtitle>
+        <language>dut</language>
+      </subtitle>
+      <subtitle>
+        <language>est</language>
+      </subtitle>
+      <subtitle>
+        <language>fin</language>
+      </subtitle>
+      <subtitle>
+        <language>fre</language>
+      </subtitle>
+      <subtitle>
+        <language>fre</language>
+      </subtitle>
+      <subtitle>
+        <language>ger</language>
+      </subtitle>
+      <subtitle>
+        <language>gre</language>
+      </subtitle>
+      <subtitle>
+        <language>heb</language>
+      </subtitle>
+      <subtitle>
+        <language>hin</language>
+      </subtitle>
+      <subtitle>
+        <language>hun</language>
+      </subtitle>
+      <subtitle>
+        <language>ice</language>
+      </subtitle>
+      <subtitle>
+        <language>ind</language>
+      </subtitle>
+      <subtitle>
+        <language>ita</language>
+      </subtitle>
+      <subtitle>
+        <language>ita</language>
+      </subtitle>
+      <subtitle>
+        <language>jpn</language>
+      </subtitle>
+      <subtitle>
+        <language>kor</language>
+      </subtitle>
+      <subtitle>
+        <language>lav</language>
+      </subtitle>
+      <subtitle>
+        <language>lit</language>
+      </subtitle>
+      <subtitle>
+        <language>may</language>
+      </subtitle>
+      <subtitle>
+        <language>nor</language>
+      </subtitle>
+      <subtitle>
+        <language>pol</language>
+      </subtitle>
+      <subtitle>
+        <language>por</language>
+      </subtitle>
+      <subtitle>
+        <language>por</language>
+      </subtitle>
+      <subtitle>
+        <language>rum</language>
+      </subtitle>
+      <subtitle>
+        <language>rus</language>
+      </subtitle>
+      <subtitle>
+        <language>srp</language>
+      </subtitle>
+      <subtitle>
+        <language>slo</language>
+      </subtitle>
+      <subtitle>
+        <language>slv</language>
+      </subtitle>
+      <subtitle>
+        <language>spa</language>
+      </subtitle>
+      <subtitle>
+        <language>spa</language>
+      </subtitle>
+      <subtitle>
+        <language>swe</language>
+      </subtitle>
+      <subtitle>
+        <language>tam</language>
+      </subtitle>
+      <subtitle>
+        <language>tel</language>
+      </subtitle>
+      <subtitle>
+        <language>tha</language>
+      </subtitle>
+      <subtitle>
+        <language>tur</language>
+      </subtitle>
+      <subtitle>
+        <language>ukr</language>
+      </subtitle>
+      <subtitle>
+        <language>vie</language>
+      </subtitle>
+    </streamdetails>
+  </fileinfo>
+  <actor>
+    <name>Sam Neill</name>
+    <role>Grant</role>
+    <order>0</order>
+    <thumb>https://image.tmdb.org/t/p/original/iIfuxalf37xUayuGyK0zG7z6WEZ.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Laura Dern</name>
+    <role>Ellie</role>
+    <order>1</order>
+    <thumb>https://image.tmdb.org/t/p/original/gB9PnGEvxKg33OSlcqptQwTBwPE.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Jeff Goldblum</name>
+    <role>Malcolm</role>
+    <order>2</order>
+    <thumb>https://image.tmdb.org/t/p/original/kcyEPgYtBP5Pm6LLeLGfXKjYovL.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Richard Attenborough</name>
+    <role>Hammond</role>
+    <order>3</order>
+    <thumb>https://image.tmdb.org/t/p/original/mJGvNS69xUqiNRybKzPl2Zuxe9Z.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Bob Peck</name>
+    <role>Muldoon</role>
+    <order>4</order>
+    <thumb>https://image.tmdb.org/t/p/original/66wkMHY76swadwfHLcTEKEKhUbv.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Martin Ferrero</name>
+    <role>Gennaro</role>
+    <order>5</order>
+    <thumb>https://image.tmdb.org/t/p/original/exNDaap66dmsfBQkCf7vHGj3TBK.jpg</thumb>
+  </actor>
+  <actor>
+    <name>BD Wong</name>
+    <role>Wu</role>
+    <order>6</order>
+    <thumb>https://image.tmdb.org/t/p/original/w7Hs9m6ocS2qlibvrLOvmyCKbAN.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Joseph Mazzello</name>
+    <role>Tim</role>
+    <order>7</order>
+    <thumb>https://image.tmdb.org/t/p/original/44gsv7TlXOOKDGg5aRtqxZjM9ae.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Ariana Richards</name>
+    <role>Lex</role>
+    <order>8</order>
+    <thumb>https://image.tmdb.org/t/p/original/vExv1HJqOjM1ui0rRiOxD3XNapf.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Samuel L. Jackson</name>
+    <role>Arnold</role>
+    <order>9</order>
+    <thumb>https://image.tmdb.org/t/p/original/AiAYAqwpM5xmiFrAIeQvUXDCVvo.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Wayne Knight</name>
+    <role>Nedry</role>
+    <order>10</order>
+    <thumb>https://image.tmdb.org/t/p/original/yS3k7HZ8gSWyXrvvsX7V7oEmdHY.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Gerald R. Molen</name>
+    <role>Harding</role>
+    <order>11</order>
+    <thumb>https://image.tmdb.org/t/p/original/m1C2E9MWClm3ITzxQzUxmE1qphL.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Miguel Sandoval</name>
+    <role>Rostagno</role>
+    <order>12</order>
+    <thumb>https://image.tmdb.org/t/p/original/v5tHxTkgOqcdWgjoEhUj0a50NIK.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Cameron Thor</name>
+    <role>Dodgson</role>
+    <order>13</order>
+  </actor>
+  <actor>
+    <name>Christopher John Fields</name>
+    <role>Volunteer #1</role>
+    <order>14</order>
+    <thumb>https://image.tmdb.org/t/p/original/3ASDmbBZQnk526pPeNtb8LOJXBX.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Whit Hertford</name>
+    <role>Volunteer Boy</role>
+    <order>15</order>
+    <thumb>https://image.tmdb.org/t/p/original/g4GiwQWixCXiPEWj5RXtAFwUX68.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Dean Cundey</name>
+    <role>Mate</role>
+    <order>16</order>
+    <thumb>https://image.tmdb.org/t/p/original/5f95wKLwh4OTjGEzNkDhOdixDxU.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Jophery C. Brown</name>
+    <role>Worker in Raptor Pen</role>
+    <order>17</order>
+    <thumb>https://image.tmdb.org/t/p/original/Uf6SfhpfFvSUCNGQylUFdHn2pV.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Tom Mishler</name>
+    <role>Helicopter Pilot</role>
+    <order>18</order>
+  </actor>
+  <actor>
+    <name>Greg Burson</name>
+    <role>Mr. D.N.A. (voice)</role>
+    <order>19</order>
+    <thumb>https://image.tmdb.org/t/p/original/5YbQ0XmgbfKSOqAJ3nhejiYD5e9.jpg</thumb>
+  </actor>
+  <actor>
+    <name>Adrian Escober</name>
+    <role>Worker at Amber Mine</role>
+    <order>20</order>
+  </actor>
+  <actor>
+    <name>Richard Kiley</name>
+    <role>Jurassic Park Tour Voice (voice)</role>
+    <order>21</order>
+    <thumb>https://image.tmdb.org/t/p/original/1s24x1TsT8DxBKGksTeeaCmKYvU.jpg</thumb>
+  </actor>
+</movie>

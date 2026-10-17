@@ -1,0 +1,11 @@
+name: check
+on: [push, pull_request]
+jobs:
+  check:
+    # The image's default Xcode supplies Swift. ./scripts/setup fails the run if
+    # it doesn't match .swift-version, so a runner update can't change it silently.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/setup
+      - run: ./scripts/check
