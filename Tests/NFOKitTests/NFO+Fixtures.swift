@@ -26,4 +26,11 @@ extension NFO {
         guard case .malformedXML(let error) = kind else { throw UnexpectedKindError(kind: kind) }
         return error
     }
+
+    /// The converted BBCode of a scene NFO. Throws for any other kind or a scene NFO without
+    /// BBCode, like ``mediaItems()``.
+    func bbcode() throws -> BBCodeText {
+        guard case .scene(let bbcode?) = kind else { throw UnexpectedKindError(kind: kind) }
+        return bbcode
+    }
 }

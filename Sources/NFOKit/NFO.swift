@@ -10,8 +10,9 @@ public struct NFO: Sendable, Equatable {
         case xml
         /// Starts with `<` but does not parse. Show it raw along with the error.
         case malformedXML(XMLParseError)
-        /// Plain text, usually release-group ASCII art. Show it monospaced and unwrapped.
-        case scene
+        /// Plain text, usually release-group ASCII art. Show it monospaced and unwrapped. Holds
+        /// the text with its BBCode converted when the file has any.
+        case scene(BBCodeText?)
     }
 
     /// Thrown when a file that starts with `<` is not valid UTF-8. Kodi XML is always UTF-8.
@@ -53,7 +54,7 @@ public struct NFO: Sendable, Equatable {
 
         guard firstCharacter == UInt8(ascii: "<") else {
             let text = try String(data: body, encoding: .utf8) ?? CP437.decode(body)
-            return NFO(text: text, kind: .scene)
+            return NFO(text: text, kind: .scene(BBCodeText(parsing: text)))
         }
 
         guard let text = String(data: body, encoding: .utf8) else {

@@ -49,14 +49,20 @@ import Testing
 
 @Test func decodesUTF8SceneNFOs() throws {
     let nfo = try NFO.fixture("scene-utf8.nfo")
-    #expect(nfo.kind == .scene)
+    #expect(nfo.kind == .scene(nil))
     #expect(nfo.text.hasPrefix("RELEASE NFO █▓▒░\r\n"))
 }
 
 @Test func decodesNonUTF8SceneNFOsAsCP437() throws {
     let nfo = try NFO.fixture("scene-cp437.nfo")
-    #expect(nfo.kind == .scene)
+    #expect(nfo.kind == .scene(nil))
     #expect(nfo.text == "   ██▓▒░ EXAMPLE ░▒▓██\r\n   ╔══╗\r\n")
+}
+
+@Test func convertsBBCodeInSceneNFOs() throws {
+    let nfo = try NFO.fixture("bbcode-release.nfo")
+    #expect(try nfo.bbcode().text.hasPrefix("-----"))
+    #expect(nfo.text.hasPrefix("[font=Courier New]\n"))
 }
 
 @Test func reportsParseErrorColumnsWithinTheFile() throws {
@@ -105,5 +111,5 @@ import Testing
     let tooLarge = Data(repeating: UInt8(ascii: "A"), count: NFO.maxFileSize + 1)
     let error = #expect(throws: NFO.FileTooLargeError.self) { try NFO.parse(tooLarge) }
     #expect(error?.size == NFO.maxFileSize + 1)
-    #expect(try NFO.parse(tooLarge.dropLast()).kind == .scene)
+    #expect(try NFO.parse(tooLarge.dropLast()).kind == .scene(nil))
 }
