@@ -2,12 +2,17 @@ import NFOKit
 import SwiftUI
 
 /// Picks the view for the NFO's kind: info cards for media-server XML, text for the rest.
-struct NFODocumentView: View {
+public struct NFODocumentView: View {
     let nfo: NFO
     /// Nil for a document that has no file, which a viewer never opens in practice.
     let fileURL: URL?
 
-    var body: some View {
+    public init(nfo: NFO, fileURL: URL?) {
+        self.nfo = nfo
+        self.fileURL = fileURL
+    }
+
+    public var body: some View {
         switch nfo.kind {
         case .media(let items):
             MediaView(items: items, text: nfo.text, fileURL: fileURL)

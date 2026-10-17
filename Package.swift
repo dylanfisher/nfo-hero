@@ -11,7 +11,8 @@ let package = Package(
     ],
     targets: [
         .target(name: "NFOKit", swiftSettings: strict),
-        .executableTarget(name: "NFOHero", dependencies: ["NFOKit"], swiftSettings: strict),
+        .target(name: "NFOUI", dependencies: ["NFOKit"], swiftSettings: strict),
+        .executableTarget(name: "NFOHero", dependencies: ["NFOUI"], swiftSettings: strict),
         .testTarget(
             name: "NFOKitTests",
             dependencies: ["NFOKit"],

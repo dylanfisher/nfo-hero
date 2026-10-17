@@ -20,7 +20,7 @@ against a codebase you haven't searched.
 | a type | `rg '(struct\|class\|enum\|protocol\|actor) <Name>' --type swift` |
 | a helper | `rg 'func <name>' --type swift Sources/` |
 | a parsing, decoding or detection rule | `ls Sources/NFOKit/` |
-| a view | `rg 'View(Representable)?\b' --type swift Sources/NFOHero/` |
+| a view | `rg 'View(Representable)?\b' --type swift Sources/NFOUI/` |
 | a bundle value (ID, version, file types) | `plutil -p Resources/Info.plist` — the only place they live |
 
 If a search turns up something close but not identical, that's the second occurrence. Use it or
@@ -28,19 +28,21 @@ duplicate it — do not abstract yet (principle 3).
 
 ## Tiers
 
-Two SwiftPM targets. The dependency direction is one-way: **app → kit**.
+Three SwiftPM targets. The dependency direction is one-way: **app → ui → kit**.
 
 | Tier | Path | What belongs here | May import from |
 |---|---|---|---|
 | **kit** | `Sources/NFOKit` | Turning an NFO's bytes into something to show: XML-vs-scene detection, Kodi XML parsing, CP437/UTF-8 decoding, BBCode conversion, artwork lookup. Pure and tested. | `Foundation` only |
-| **app** | `Sources/NFOHero` | `@main`, the `DocumentGroup`, views, the `NSTextView` wrapper, menu commands, artwork decoding. | kit, Apple frameworks |
+| **ui** | `Sources/NFOUI` | The views that show an NFO: info cards, the `NSTextView` wrapper, artwork decoding. Only `NFODocumentView` and what the menu needs are public. | kit, Apple frameworks |
+| **app** | `Sources/NFOHero` | `@main`, the `DocumentGroup`, the document type, menu commands. | ui, kit, Apple frameworks |
 
-SwiftPM's target graph stops kit importing app. `scripts/arch`, run by `./scripts/check`, fails
-if kit imports anything but `Foundation` — that is what keeps it testable without the UI. Logic
-that can be tested without a window goes in kit, even when only one view uses it.
+SwiftPM's target graph stops kit importing ui or app, and ui importing app. `scripts/arch`, run
+by `./scripts/check`, fails if kit imports anything but `Foundation` — that is what keeps it
+testable without the UI. Logic that can be tested without a window goes in kit, even when only one
+view uses it. The ui tier has no import rule: it may use any Apple framework the app may.
 
 Tests mirror the kit tree in `Tests/NFOKitTests/`; real NFO files for them go in its `Fixtures/`.
-The app tier has no test target.
+The ui and app tiers have no test target.
 
 ## Naming
 
@@ -57,6 +59,6 @@ The app tier has no test target.
 
 A promotion is its own commit, separate from whatever work revealed it (principle 4).
 
-<!-- paths: Sources/NFOKit Sources/NFOHero -->
+<!-- paths: Sources/NFOKit Sources/NFOUI Sources/NFOHero -->
 <!-- ↑ scripts/check verifies every path above exists. Keep it in sync with the Tiers table;
      a rename that misses this line fails the gate, which is the point. -->

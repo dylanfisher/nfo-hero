@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # NFOKit is the tested core and imports only Foundation, so UI and platform code
-# stays in NFOHero. SwiftPM's target graph already stops NFOKit importing NFOHero;
-# this covers system frameworks, which the graph can't see.
+# stays in NFOUI and NFOHero. SwiftPM's target graph already stops NFOKit
+# importing them; this covers system frameworks, which the graph can't see.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

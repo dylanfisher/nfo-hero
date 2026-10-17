@@ -12,10 +12,10 @@ declare the `.nfo` and `.diz` file types and open from Finder.
 
 ## Decision
 
-A Swift package (Swift 6.4, Swift 6 language mode, macOS 15+) with two targets: `NFOKit` for pure,
-tested logic and `NFOHero` for the SwiftUI app. `scripts/bundle` wraps the built executable and
-`Resources/Info.plist` into `dist/NFO Hero.app`, ad-hoc signed. Tests use Swift Testing; format
-and lint use the toolchain's `swift format`.
+A Swift package (Swift 6.4, Swift 6 language mode, macOS 15+) with three targets: `NFOKit` for
+pure, tested logic, `NFOUI` for the views that show an NFO, and `NFOHero` for the SwiftUI app.
+`scripts/bundle` wraps the built executable and `Resources/Info.plist` into `dist/NFO Hero.app`,
+ad-hoc signed. Tests use Swift Testing; format and lint use the toolchain's `swift format`.
 
 ## Alternatives considered
 
@@ -25,8 +25,10 @@ and lint use the toolchain's `swift format`.
   Revisit if signing, entitlements or asset catalogs outgrow `scripts/bundle`.
 - **One target** — rejected: tests for code inside an executable target need a host app, which is
   slower and more fragile than testing a library.
-- **Three targets (kit / views / app)** — rejected: more structure than a simple viewer needs. The
-  views/app split is not worth a module boundary.
+- **Two targets (kit / app)** — used at first, when the app was the only thing showing an NFO. A
+  Quick Look extension is its own executable and cannot import an executable target, so the views
+  moved to `NFOUI`, which both link. For the app alone the split would not have been worth a
+  module boundary.
 - **SwiftFormat + SwiftLint** — rejected: two Homebrew tools to install and pin, for rules a small
   app doesn't need. `swift format` ships with the toolchain and can't drift from it.
 - **Minimum macOS 26** — rejected: nothing used is new in 26, and 15 covers the previous release.

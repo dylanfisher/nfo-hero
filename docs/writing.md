@@ -51,7 +51,7 @@ Format: [Conventional Commits](https://www.conventionalcommits.org/).
 
 - **Summary:** imperative mood ("add", not "added"), lowercase after the colon, no trailing period,
   72 characters max for the whole title line. It completes the sentence "This commit will…".
-- **No scopes.** With two tiers they add nothing; say what changed in the summary.
+- **No scopes.** With three tiers they add nothing; say what changed in the summary.
 - **Body:** required unless the title says everything. Explain why the change was made, what
   alternatives were rejected, and anything a reviewer should look at closely. Don't list the files
   changed — the diff does that. Wrap at 72.
