@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Build NFOHero and wrap it in dist/<CFBundleName>.app, ad-hoc signed. Prints the
-# app's path on stdout; build output goes to stderr. Pass `release` for an
-# optimized build.
+# Build NFOHero and wrap it in dist/<CFBundleName>.app, ad-hoc signed with the
+# hardened runtime. Prints the app's path on stdout; build output goes to
+# stderr. Pass `release` for an optimized build.
 #
 # Resources/Info.plist is the source for the bundle's name, ID, version and file
 # types. The minimum macOS version comes from Package.swift and is copied in here.
@@ -21,6 +21,8 @@ mkdir -p "$app/Contents/MacOS"
 cp "$plist" "$app/Contents/Info.plist"
 plutil -replace LSMinimumSystemVersion -string "$min_macos" "$app/Contents/Info.plist"
 cp "$bin" "$app/Contents/MacOS/"
-codesign --force --sign - "$app" >&2
+# Hardened runtime, with no entitlements: no App Sandbox (see
+# docs/decisions/0004-no-app-sandbox.md) and no network access to grant.
+codesign --force --options runtime --sign - "$app" >&2
 
 echo "$app"
