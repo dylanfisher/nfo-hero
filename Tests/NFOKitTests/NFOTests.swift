@@ -75,3 +75,13 @@ import Testing
         """
     #expect(try NFO.parse(Data(text.utf8)).mediaItems().map(\.title) == ["Amélie █", "東京物語"])
 }
+
+// Freeing a tree this deep overflowed the stack and crashed.
+@Test func reportsDeeplyNestedXMLAsMalformed() throws {
+    let depth = 20_000
+    let text =
+        "<movie>" + String(repeating: "<a>", count: depth) + String(repeating: "</a>", count: depth)
+        + "</movie>"
+    #expect(try NFO.parse(Data(text.utf8)).parseError().message.contains("nested"))
+}
+

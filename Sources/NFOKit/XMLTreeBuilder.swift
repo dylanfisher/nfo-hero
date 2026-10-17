@@ -6,6 +6,10 @@ final class XMLTreeBuilder: NSObject, XMLParserDelegate {
     // No newline after the opening tag, so parser line numbers match `text`.
     private static let opening = "<\(wrapperName)>"
     private static let closing = "</\(wrapperName)>"
+    /// Deeper input is reported as malformed. Kodi NFOs nest about five levels, but the finished
+    /// tree is freed recursively, so a file nested a few thousand deep overflows the stack and
+    /// crashes the app. 256 is libxml2's own default limit.
+    private static let maxDepth = 256
 
     private var stack: [XMLTreeElement] = []
     private var root: XMLTreeElement?
@@ -80,6 +84,13 @@ final class XMLTreeBuilder: NSObject, XMLParserDelegate {
         qualifiedName: String?,
         attributes: [String: String]
     ) {
+        guard stack.count < Self.maxDepth else {
+            firstError = XMLParseError(
+                line: parser.lineNumber, column: parser.columnNumber,
+                message: "Elements are nested more than \(Self.maxDepth) deep")
+            parser.abortParsing()
+            return
+        }
         stack.append(XMLTreeElement(name: elementName, attributes: attributes))
     }
 

@@ -2,7 +2,7 @@ import Foundation
 import NFOKit
 import Testing
 
-private struct NotMediaError: Error {
+private struct UnexpectedKindError: Error {
     let kind: NFO.Kind
 }
 
@@ -17,7 +17,13 @@ extension NFO {
     /// The items of a media NFO. Throws for any other kind, so the test stops at the line that
     /// expected media instead of failing every check after it.
     func mediaItems() throws -> [MediaItem] {
-        guard case .media(let items) = kind else { throw NotMediaError(kind: kind) }
+        guard case .media(let items) = kind else { throw UnexpectedKindError(kind: kind) }
         return items
+    }
+
+    /// The parse error of a malformed XML NFO. Throws for any other kind, like ``mediaItems()``.
+    func parseError() throws -> XMLParseError {
+        guard case .malformedXML(let error) = kind else { throw UnexpectedKindError(kind: kind) }
+        return error
     }
 }
