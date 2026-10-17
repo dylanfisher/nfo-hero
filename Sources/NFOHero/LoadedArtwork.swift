@@ -31,14 +31,16 @@ struct LoadedArtwork: Sendable {
     /// Failures are logged and leave the image out instead of showing an error: artwork is
     /// optional, the card is complete without it, and an unreadable folder or image is not
     /// something the user opened the file to see. `log stream --predicate 'category == "artwork"'`
-    /// shows them.
+    /// shows them. Paths and errors are private, because file names in a media library say what
+    /// the user watches, and the unified log is readable by admin users and goes into
+    /// sysdiagnose reports.
     static func load(nextTo nfoURL: URL) async -> LoadedArtwork {
         await Task.detached(priority: .userInitiated) {
             let artwork: Artwork
             do {
                 artwork = try Artwork(nextTo: nfoURL)
             } catch {
-                logger.error("Could not look for artwork: \(error, privacy: .public)")
+                logger.error("Could not look for artwork: \(error, privacy: .private)")
                 return .none
             }
             return LoadedArtwork(
@@ -55,18 +57,18 @@ struct LoadedArtwork: Sendable {
             kCGImageSourceThumbnailMaxPixelSize: maxPixels,
         ]
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else {
-            logger.error("Could not read \(url.path, privacy: .public)")
+            logger.error("Could not read \(url.path, privacy: .private)")
             return nil
         }
         // CGImageSourceCreateWithURL only reads enough to tell the type; decoding happens below.
         guard let type = CGImageSourceGetType(source) as String?, decodableTypes.contains(type)
         else {
-            logger.error("Not a JPEG or PNG: \(url.path, privacy: .public)")
+            logger.error("Not a JPEG or PNG: \(url.path, privacy: .private)")
             return nil
         }
         guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
         else {
-            logger.error("Could not decode \(url.path, privacy: .public)")
+            logger.error("Could not decode \(url.path, privacy: .private)")
             return nil
         }
         return image
