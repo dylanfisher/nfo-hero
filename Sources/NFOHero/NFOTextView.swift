@@ -9,7 +9,16 @@ struct NFOTextView: NSViewRepresentable {
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSTextView.scrollableTextView()
         scrollView.hasHorizontalScroller = true
-        let textView = scrollView.documentView as! NSTextView
+        // TextKit 1, because TextKit 2 lays out the whole document before the first draw when
+        // lines do not wrap: 0.8 s on the main thread for a 5 MB file. TextKit 1 draws the first
+        // screen and lays out the rest in the background, so for a large file the scrollers
+        // settle over a few seconds. The other settings match the TextKit 2 view that
+        // scrollableTextView() makes.
+        let textView = NSTextView(usingTextLayoutManager: false)
+        textView.autoresizingMask = [.width, .height]
+        textView.isRichText = false
+        textView.usesRuler = false
+        scrollView.documentView = textView
         textView.isEditable = false
         textView.usesFindBar = true
         textView.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
