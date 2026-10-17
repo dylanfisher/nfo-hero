@@ -40,14 +40,17 @@ public struct NFO: Sendable, Equatable {
     /// after the last element.
     public let text: String
     public let kind: Kind
+    /// What the text was decoded with. Always UTF-8 for XML.
+    public let encoding: TextEncoding
     /// The lines of the text a text view shows for the NFO: the text with its BBCode converted for
     /// a scene NFO that has any, ``text`` otherwise. Measured here because parsing runs off the
     /// main thread, and the window is sized from it before it opens.
     public let textExtent: TextExtent
 
-    private init(text: String, kind: Kind) {
+    private init(text: String, kind: Kind, encoding: TextEncoding) {
         self.text = text
         self.kind = kind
+        self.encoding = encoding
         if case .scene(let bbcode?) = kind {
             textExtent = TextExtent(measuring: bbcode.text)
         } else {
@@ -63,16 +66,22 @@ public struct NFO: Sendable, Equatable {
     /// as CP437 otherwise, since DOS art draws the controls as glyphs.
     ///
     /// Malformed XML does not throw; it comes back as ``Kind/malformedXML(_:)``.
-    public static func parse(_ data: Data) throws -> NFO {
+    ///
+    /// - Parameter encoding: Decodes a scene NFO with this instead of detecting its encoding. XML
+    ///   is always UTF-8.
+    public static func parse(_ data: Data, encoding: TextEncoding? = nil) throws -> NFO {
         guard data.count <= maxFileSize else { throw FileTooLargeError(size: data.count) }
         let body = data.starts(with: byteOrderMark) ? Data(data.dropFirst(3)) : data
         let firstCharacter = body.first { !isASCIIWhitespace($0) }
 
         guard firstCharacter == UInt8(ascii: "<") else {
             let art = SAUCE.removingTrailer(from: body)
-            let utf8 = art.contains(where: isDOSGlyph) ? nil : String(data: art, encoding: .utf8)
-            let text = utf8 ?? CP437.decode(art)
-            return NFO(text: text, kind: .scene(BBCodeText(parsing: text)))
+            let encoding =
+                encoding
+                ?? (art.contains(where: isDOSGlyph) || String(data: art, encoding: .utf8) == nil
+                    ? .cp437 : .utf8)
+            let text = encoding.decode(art)
+            return NFO(text: text, kind: .scene(BBCodeText(parsing: text)), encoding: encoding)
         }
 
         guard let text = String(data: body, encoding: .utf8) else {
@@ -81,9 +90,9 @@ public struct NFO: Sendable, Equatable {
         do {
             let roots = try XMLTreeBuilder.roots(of: text)
             let items = roots.compactMap(MediaItem.init(element:))
-            return NFO(text: text, kind: items.isEmpty ? .xml : .media(items))
+            return NFO(text: text, kind: items.isEmpty ? .xml : .media(items), encoding: .utf8)
         } catch {
-            return NFO(text: text, kind: .malformedXML(error))
+            return NFO(text: text, kind: .malformedXML(error), encoding: .utf8)
         }
     }
 

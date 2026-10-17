@@ -35,7 +35,7 @@ Four SwiftPM targets: two executables that share the ui tier. The dependency dir
 |---|---|---|---|
 | **kit** | `Sources/NFOKit` | Turning an NFO's bytes into something to show: XML-vs-scene detection, Kodi XML parsing, CP437/UTF-8 decoding, BBCode conversion, artwork lookup. Pure and tested. | `Foundation` only |
 | **ui** | `Sources/NFOUI` | The views that show an NFO: info cards, the `NSTextView` wrapper, artwork decoding. Only `NFODocumentView` and what the menu needs are public. | kit, Apple frameworks |
-| **app** | `Sources/NFOHero` | `@main`, the `DocumentGroup`, the document type, menu commands, the window's Show Raw state. | ui, kit, Apple frameworks |
+| **app** | `Sources/NFOHero` | `@main`, the `DocumentGroup`, the document type, menu commands, the window's Show Raw and Text Encoding state. | ui, kit, Apple frameworks |
 | **extension** | `Sources/NFOQuickLook` | The Quick Look preview's view controller. Sandboxed, so it cannot read the NFO's folder ([0006](decisions/0006-quick-look-preview.md)). | ui, kit, Apple frameworks |
 
 SwiftPM's target graph stops kit importing ui, ui importing app or extension, and the two

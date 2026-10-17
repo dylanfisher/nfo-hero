@@ -7,7 +7,7 @@ import SwiftUI
 struct NFOHeroApp: App {
     var body: some Scene {
         DocumentGroup(viewing: NFODocument.self) { file in
-            NFOWindowView(nfo: file.document.nfo, fileURL: file.fileURL)
+            NFOWindowView(document: file.document, fileURL: file.fileURL)
         }
         .defaultWindowPlacement { content, context in
             // The placement's size is the window's frame, so the title bar is added to the
@@ -24,6 +24,7 @@ struct NFOHeroApp: App {
         }
         .commands {
             ShowRawCommands()
+            TextEncodingCommands()
         }
     }
 }
