@@ -22,7 +22,7 @@ struct MediaView: View {
                 cards
             }
         }
-        .focusedSceneValue(\.showRaw, $showRaw)
+        .focusedSceneValue(\.showRaw, ShowRawToggle($showRaw))
         .task(id: fileURL) {
             guard let fileURL else { return }
             loaded.wrappedValue = await LoadedArtwork.load(nextTo: fileURL)

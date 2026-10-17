@@ -6,7 +6,7 @@ struct ShowRawCommands: Commands {
 
     var body: some Commands {
         CommandGroup(after: .toolbar) {
-            Toggle("Show Raw", isOn: showRaw ?? .constant(false))
+            Toggle("Show Raw", isOn: showRaw?.isOn ?? .constant(false))
                 .keyboardShortcut("u", modifiers: [.command, .option])
                 .disabled(showRaw == nil)
         }
