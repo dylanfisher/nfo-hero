@@ -11,7 +11,9 @@ struct NFODocumentView: View {
         switch nfo.kind {
         case .media(let items):
             MediaView(items: items, text: nfo.text, fileURL: fileURL)
-        case .xml, .scene:
+        case .scene(let bbcode?):
+            BBCodeView(source: nfo.text, bbcode: bbcode)
+        case .xml, .scene(nil):
             NFOTextView(text: nfo.text)
         case .malformedXML(let error):
             VStack(spacing: 0) {
