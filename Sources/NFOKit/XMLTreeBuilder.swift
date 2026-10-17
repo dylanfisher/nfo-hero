@@ -3,6 +3,9 @@ import Foundation
 /// Parses XML into `XMLTreeElement`s with `XMLParser`.
 final class XMLTreeBuilder: NSObject, XMLParserDelegate {
     private static let wrapperName = "nfo-hero-root"
+    // No newline after the opening tag, so parser line numbers match `text`.
+    private static let opening = "<\(wrapperName)>"
+    private static let closing = "</\(wrapperName)>"
 
     private var stack: [XMLTreeElement] = []
     private var root: XMLTreeElement?
@@ -15,15 +18,7 @@ final class XMLTreeBuilder: NSObject, XMLParserDelegate {
     /// Kodi allows a scraper URL on a line after the XML. So declarations are removed, anything
     /// after the last `>` is dropped, and the rest is wrapped in a synthetic root.
     static func roots(of text: String) throws(XMLParseError) -> [XMLTreeElement] {
-        var body = text.replacing(/<\?xml[^>]*\?>/, with: "")
-        if let lastClose = body.lastIndex(of: ">") {
-            body = String(body[...lastClose])
-        }
-        // No newline after the opening tag, so parser line numbers match `text`.
-        let opening = "<\(wrapperName)>"
-        let wrapped = "\(opening)\(body)</\(wrapperName)>"
-
-        let parser = XMLParser(data: Data(wrapped.utf8))
+        let parser = XMLParser(data: wrappedBody(of: text))
         let builder = XMLTreeBuilder()
         parser.delegate = builder
         guard parser.parse(), let root = builder.root else {
@@ -40,6 +35,42 @@ final class XMLTreeBuilder: NSObject, XMLParserDelegate {
                 line: 1, column: error.column - opening.count, message: error.message)
         }
         return root.children
+    }
+
+    /// `text` as UTF-8 inside the synthetic root, without `<?xml ...?>` declarations or anything
+    /// after the last `>`.
+    ///
+    /// Scans bytes because a regex took half the parse time of a 5 MB file. Every byte it looks
+    /// for is ASCII, and in UTF-8 an ASCII byte is never part of a multi-byte character.
+    private static func wrappedBody(of text: String) -> Data {
+        let lessThan = UInt8(ascii: "<")
+        let greaterThan = UInt8(ascii: ">")
+        let declarationStart = Array("<?xml".utf8)
+        var text = text
+        return text.withUTF8 { source in
+            var data = Data(capacity: opening.utf8.count + source.count + closing.utf8.count)
+            data.append(contentsOf: opening.utf8)
+            var copyFrom = 0
+            var searchFrom = 0
+            while let start = source[searchFrom...].firstIndex(of: lessThan) {
+                searchFrom = start + 1
+                guard source[start...].starts(with: declarationStart) else { continue }
+                let nameEnd = start + declarationStart.count
+                // With no `>` left, no later declaration can be closed either.
+                guard let close = source[nameEnd...].firstIndex(of: greaterThan) else { break }
+                // `<?xml>` is not a declaration; the `?` must come after the name.
+                guard close > nameEnd, source[close - 1] == UInt8(ascii: "?") else { continue }
+                data.append(UnsafeBufferPointer(rebasing: source[copyFrom..<start]))
+                copyFrom = close + 1
+                searchFrom = close + 1
+            }
+            data.append(UnsafeBufferPointer(rebasing: source[copyFrom...]))
+            if let lastClose = data[opening.utf8.count...].lastIndex(of: greaterThan) {
+                data.removeSubrange((lastClose + 1)...)
+            }
+            data.append(contentsOf: closing.utf8)
+            return data
+        }
     }
 
     func parser(

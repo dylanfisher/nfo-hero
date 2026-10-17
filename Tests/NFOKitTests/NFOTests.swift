@@ -67,3 +67,11 @@ import Testing
     #expect(error.line == 1)
     #expect(error.column == 9)
 }
+
+@Test func keepsNonASCIITextAroundRemovedDeclarations() throws {
+    let text = """
+        <?xml version="1.0"?><movie><title>Amélie █</title></movie>
+        <?xml version="1.0"?><movie><title>東京物語</title></movie> é
+        """
+    #expect(try NFO.parse(Data(text.utf8)).mediaItems().map(\.title) == ["Amélie █", "東京物語"])
+}
