@@ -5,3 +5,5 @@
 *.jpg binary
 *.gif binary
 *.pdf binary
+# Fixtures are real NFO bytes; scene NFOs use CRLF and CP437.
+Tests/NFOKitTests/Fixtures/** -text
