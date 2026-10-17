@@ -8,8 +8,10 @@ import SwiftUI
 final class PreviewViewController: NSViewController, QLPreviewingController {
     override func loadView() {
         view = NSView()
-        // Wide enough for an 80-column scene NFO in the 13 pt monospaced font.
-        preferredContentSize = NSSize(width: 800, height: 600)
+        // With no screen to measure, Quick Look picks the size itself.
+        if let screen = NSScreen.main {
+            preferredContentSize = WindowSize.portrait(fitting: screen.visibleFrame.size)
+        }
     }
 
     /// Quick Look shows a spinner until this returns, so the file is read and parsed off the main
