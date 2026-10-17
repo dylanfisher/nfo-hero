@@ -1,7 +1,7 @@
 /// The fields of one Kodi NFO root element that an info card shows. Empty elements read as nil
 /// or are left out of arrays.
 public struct MediaItem: Sendable, Equatable {
-    public enum Kind: String, Sendable, Equatable, CaseIterable {
+    public enum Kind: String, Sendable, Equatable {
         case movie
         case tvShow = "tvshow"
         case episode = "episodedetails"

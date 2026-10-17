@@ -22,11 +22,6 @@ public struct NFO: Sendable, Equatable {
     public let text: String
     public let kind: Kind
 
-    public init(text: String, kind: Kind) {
-        self.text = text
-        self.kind = kind
-    }
-
     private static let byteOrderMark = Data([0xEF, 0xBB, 0xBF])
 
     /// Detects the kind from the first non-whitespace character: `<` means XML, decoded as
