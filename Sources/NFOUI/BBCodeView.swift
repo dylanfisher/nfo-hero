@@ -6,17 +6,17 @@ import SwiftUI
 struct BBCodeView: View {
     let source: String
     let bbcode: BBCodeText
-
-    @SceneStorage("showRaw") private var showRaw = false
+    /// Nil where there is no View → Show Raw.
+    let showRaw: Binding<Bool>?
 
     var body: some View {
         Group {
-            if showRaw {
+            if showRaw?.wrappedValue == true {
                 NFOTextView(text: source)
             } else {
                 NFOTextView(text: bbcode.text, runs: bbcode.runs)
             }
         }
-        .focusedSceneValue(\.showRaw, ShowRawToggle($showRaw))
+        .focusedSceneValue(\.showRaw, showRaw.map(ShowRawToggle.init))
     }
 }

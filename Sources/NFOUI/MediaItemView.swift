@@ -6,6 +6,8 @@ struct MediaItemView: View {
     let item: MediaItem
     /// Absent when the folder has no poster; the card then has no image and no placeholder.
     let poster: LoadedArtwork.Slot
+    /// Whether View → Show Raw exists to point to for the cast the card leaves out.
+    let hasShowRaw: Bool
 
     /// Between the facts on one line, such as rating, runtime and genres.
     private static let factSeparator = "  ·  "
@@ -161,8 +163,11 @@ struct MediaItemView: View {
                 }
             }
             if item.unlistedCastCount > 0 {
-                Text("and \(item.unlistedCastCount.formatted()) more, listed in View → Show Raw")
-                    .foregroundStyle(.secondary)
+                Text(
+                    "and \(item.unlistedCastCount.formatted()) more"
+                        + (hasShowRaw ? ", listed in View → Show Raw" : "")
+                )
+                .foregroundStyle(.secondary)
             }
         }
     }

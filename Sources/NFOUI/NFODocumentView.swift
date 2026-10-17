@@ -4,20 +4,27 @@ import SwiftUI
 /// Picks the view for the NFO's kind: info cards for media-server XML, text for the rest.
 public struct NFODocumentView: View {
     let nfo: NFO
-    /// Nil for a document that has no file, which a viewer never opens in practice.
     let fileURL: URL?
+    let showRaw: Binding<Bool>?
 
-    public init(nfo: NFO, fileURL: URL?) {
+    /// - Parameters:
+    ///   - fileURL: The file, whose folder is searched for artwork. Nil shows cards without
+    ///     artwork.
+    ///   - showRaw: The window's View → Show Raw state, which info cards and BBCode publish to the
+    ///     menu and follow. Nil where there is no menu, such as Quick Look: the cards and the
+    ///     drawn BBCode always show, and nothing mentions Show Raw.
+    public init(nfo: NFO, fileURL: URL?, showRaw: Binding<Bool>?) {
         self.nfo = nfo
         self.fileURL = fileURL
+        self.showRaw = showRaw
     }
 
     public var body: some View {
         switch nfo.kind {
         case .media(let items):
-            MediaView(items: items, text: nfo.text, fileURL: fileURL)
+            MediaView(items: items, text: nfo.text, fileURL: fileURL, showRaw: showRaw)
         case .scene(let bbcode?):
-            BBCodeView(source: nfo.text, bbcode: bbcode)
+            BBCodeView(source: nfo.text, bbcode: bbcode, showRaw: showRaw)
         case .xml, .scene(nil):
             NFOTextView(text: nfo.text)
         case .malformedXML(let error):

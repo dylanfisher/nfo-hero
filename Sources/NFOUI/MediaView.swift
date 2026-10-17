@@ -7,8 +7,9 @@ struct MediaView: View {
     let items: [MediaItem]
     let text: String
     let fileURL: URL?
+    /// Nil where there is no View → Show Raw.
+    let showRaw: Binding<Bool>?
 
-    @SceneStorage("showRaw") private var showRaw = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // State as a plain property rather than `@State`: in the macOS 27 SDK `@State` is a macro
     // whose plugin ships only with Xcode, so it does not build with the Command Line Tools.
@@ -16,10 +17,11 @@ struct MediaView: View {
     private let loaded: State<LoadedArtwork?>
     private var artwork: LoadedArtwork? { loaded.wrappedValue }
 
-    init(items: [MediaItem], text: String, fileURL: URL?) {
+    init(items: [MediaItem], text: String, fileURL: URL?, showRaw: Binding<Bool>?) {
         self.items = items
         self.text = text
         self.fileURL = fileURL
+        self.showRaw = showRaw
         // Found here rather than in the task below so the first layout already holds the poster's
         // space, and the card does not move when the poster is decoded. SwiftUI keeps the first
         // value and ignores the ones from later inits.
@@ -28,13 +30,13 @@ struct MediaView: View {
 
     var body: some View {
         Group {
-            if showRaw {
+            if showRaw?.wrappedValue == true {
                 NFOTextView(text: text)
             } else {
                 cards
             }
         }
-        .focusedSceneValue(\.showRaw, ShowRawToggle($showRaw))
+        .focusedSceneValue(\.showRaw, showRaw.map(ShowRawToggle.init))
         .task(id: fileURL) {
             guard let fileURL else { return }
             var found = artwork
@@ -56,7 +58,9 @@ struct MediaView: View {
             LazyVStack(alignment: .leading, spacing: 32) {
                 ForEach(items.indices, id: \.self) { index in
                     if index > 0 { Divider() }
-                    MediaItemView(item: items[index], poster: artwork?.poster ?? .absent)
+                    MediaItemView(
+                        item: items[index], poster: artwork?.poster ?? .absent,
+                        hasShowRaw: showRaw != nil)
                 }
             }
             .padding(24)
