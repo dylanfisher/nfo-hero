@@ -7,6 +7,11 @@ struct MediaItemView: View {
     /// Nil when the folder has no poster; the card then has no image and no placeholder.
     let poster: CGImage?
 
+    /// Between the facts on one line, such as rating, runtime and genres.
+    private static let factSeparator = "  ·  "
+    /// Between the names in one fact, such as genres or directors.
+    private static let listSeparator = ", "
+
     var body: some View {
         HStack(alignment: .top, spacing: 24) {
             if let poster {
@@ -23,10 +28,10 @@ struct MediaItemView: View {
                     Text(tagline).font(.title3).italic().foregroundStyle(.secondary)
                 }
                 if !facts.isEmpty {
-                    Text(facts.joined(separator: "  ·  ")).foregroundStyle(.secondary)
+                    Text(facts.joined(separator: Self.factSeparator)).foregroundStyle(.secondary)
                 }
                 if !otherRatings.isEmpty {
-                    Text(otherRatings.joined(separator: "  ·  "))
+                    Text(otherRatings.joined(separator: Self.factSeparator))
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
@@ -48,7 +53,7 @@ struct MediaItemView: View {
             if item.kind == .episode {
                 let episodeLine = [item.showTitle, item.episodeCode].compactMap { $0 }
                 if !episodeLine.isEmpty {
-                    Text(episodeLine.joined(separator: "  ·  "))
+                    Text(episodeLine.joined(separator: Self.factSeparator))
                         .font(.headline)
                         .foregroundStyle(.secondary)
                 }
@@ -60,7 +65,7 @@ struct MediaItemView: View {
                 Text(originalTitle).font(.title3).foregroundStyle(.secondary)
             }
             if !item.artists.isEmpty, item.kind != .artist {
-                Text(item.artists.joined(separator: ", ")).font(.title2)
+                Text(item.artists.joined(separator: Self.listSeparator)).font(.title2)
             }
         }
     }
@@ -76,7 +81,7 @@ struct MediaItemView: View {
             facts.append("Aired \(aired)")
         }
         if !item.genres.isEmpty {
-            facts.append(item.genres.joined(separator: ", "))
+            facts.append(item.genres.joined(separator: Self.listSeparator))
         }
         return facts
     }
@@ -104,7 +109,7 @@ struct MediaItemView: View {
             ForEach(rows, id: \.0) { label, values in
                 GridRow {
                     Text(label).foregroundStyle(.secondary)
-                    Text(values.joined(separator: ", "))
+                    Text(values.joined(separator: Self.listSeparator))
                 }
             }
         }
