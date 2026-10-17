@@ -29,7 +29,9 @@ is a scene NFO, decoded as UTF-8 when valid and CP437 otherwise. `.diz` files ar
 - **Artwork is local only:** `<name>-poster.*`, `poster.*`, `folder.*` or `cover.*` (`.jpg`,
   `.jpeg` or `.png`) beside the NFO. With none, the card has no image. `<name>-fanart.*` or
   `fanart.*` is a faded backdrop behind the cards.
-- **Scene NFOs** show in the unwrapped monospaced text view.
+- **Scene NFOs** show in the unwrapped monospaced text view, with any BBCode drawn as bold,
+  italic, underlined and colored text, and Show Raw switching to the source
+  ([0005](0005-bbcode-in-scene-nfos.md)).
 
 ## Alternatives considered
 
@@ -57,3 +59,4 @@ The files are untrusted downloads, so parsing is bounded. The synthetic root als
 `FileTooLargeError`. XML nested more than 256 deep is reported as malformed, because freeing a
 deeper tree overflowed the stack. A card lists the first 100 cast members and says how many more
 Show Raw has. Card text drops bidi override and isolate controls; the raw view keeps them.
+BBCode tags nested more than 32 deep stay literal.

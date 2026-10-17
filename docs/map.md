@@ -32,7 +32,7 @@ Two SwiftPM targets. The dependency direction is one-way: **app → kit**.
 
 | Tier | Path | What belongs here | May import from |
 |---|---|---|---|
-| **kit** | `Sources/NFOKit` | Turning an NFO's bytes into something to show: XML-vs-scene detection, Kodi XML parsing, CP437/UTF-8 decoding, artwork lookup. Pure and tested. | `Foundation` only |
+| **kit** | `Sources/NFOKit` | Turning an NFO's bytes into something to show: XML-vs-scene detection, Kodi XML parsing, CP437/UTF-8 decoding, BBCode conversion, artwork lookup. Pure and tested. | `Foundation` only |
 | **app** | `Sources/NFOHero` | `@main`, the `DocumentGroup`, views, the `NSTextView` wrapper, menu commands, artwork decoding. | kit, Apple frameworks |
 
 SwiftPM's target graph stops kit importing app. `scripts/arch`, run by `./scripts/check`, fails

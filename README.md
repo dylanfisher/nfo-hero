@@ -4,7 +4,8 @@ A fast, minimal macOS viewer that renders NFO files' CP437 ASCII art the way it 
 
 It opens both kinds of `.nfo`: the XML that Kodi, Radarr, Sonarr and Jellyfin write next to your
 media, shown as an info card with the folder's `poster.jpg`, and release NFOs with their DOS
-ASCII art intact. It never writes to your files and makes no network calls.
+ASCII art intact and their BBCode drawn as bold and colored text. It never writes to your files
+and makes no network calls.
 
 Requires macOS 15 or later.
 
