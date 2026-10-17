@@ -30,4 +30,16 @@ extension MediaItem {
 
     /// How many members of ``cast`` are past ``castLimit``.
     public var unlistedCastCount: Int { cast.count - listedCast.count }
+
+    /// The names of ``subtitleLanguages``, each once, such as `English, French`.
+    public func subtitleNames(locale: Locale = .current) -> [String] {
+        var names: [String] = []
+        for language in subtitleLanguages {
+            for name in LanguageNames.names(for: language, locale: locale)
+            where !names.contains(name) {
+                names.append(name)
+            }
+        }
+        return names
+    }
 }

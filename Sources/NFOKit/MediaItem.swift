@@ -36,6 +36,11 @@ public struct MediaItem: Sendable, Equatable {
     public var episode: Int?
     /// The episode's air date as written, usually `YYYY-MM-DD`.
     public var aired: String?
+    /// The first `<video>` of `<fileinfo><streamdetails>`.
+    public var video: VideoStream?
+    public var audioStreams: [AudioStream] = []
+    /// The `<language>` of each `<subtitle>`, as written.
+    public var subtitleLanguages: [String] = []
 
     public init(kind: Kind) {
         self.kind = kind
@@ -81,6 +86,24 @@ extension MediaItem {
         showTitle = element.string("showtitle")
         season = element.string("season").flatMap { Int($0) }
         episode = element.string("episode").flatMap { Int($0) }
+
+        let streams = element.child(named: "fileinfo")?.child(named: "streamdetails")
+        video = streams?.child(named: "video").map { video in
+            VideoStream(
+                codec: video.string("codec"),
+                width: video.string("width").flatMap { Int($0) },
+                height: video.string("height").flatMap { Int($0) },
+                hdrType: video.string("hdrtype"))
+        }
+        audioStreams =
+            streams?.children(named: "audio").map { audio in
+                AudioStream(
+                    codec: audio.string("codec"),
+                    channels: audio.string("channels").flatMap { Int($0) },
+                    language: audio.string("language"))
+            } ?? []
+        subtitleLanguages =
+            streams?.children(named: "subtitle").compactMap { $0.string("language") } ?? []
     }
 
     private static func ratings(in element: XMLTreeElement) -> [Rating] {

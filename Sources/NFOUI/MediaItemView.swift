@@ -14,6 +14,9 @@ struct MediaItemView: View {
     /// Between the names in one fact, such as genres or directors.
     private static let listSeparator = ", "
 
+    /// The widest a paragraph gets, such as the plot or a long list of subtitle languages.
+    private static let textWidth: CGFloat = 640
+
     private static let posterWidth: CGFloat = 200
     private static let posterShape = RoundedRectangle(cornerRadius: 6)
 
@@ -36,7 +39,7 @@ struct MediaItemView: View {
                         .foregroundStyle(.secondary)
                 }
                 if let plot = item.plot {
-                    Text(plot).frame(maxWidth: 640, alignment: .leading)
+                    Text(plot).frame(maxWidth: Self.textWidth, alignment: .leading)
                 }
                 credits
                 if !item.cast.isEmpty {
@@ -138,6 +141,9 @@ struct MediaItemView: View {
             ("Album", [item.album].compactMap { $0 }),
             (item.directors.count == 1 ? "Director" : "Directors", item.directors),
             (item.studios.count == 1 ? "Studio" : "Studios", item.studios),
+            ("Video", [item.video?.summary].compactMap { $0 }),
+            ("Audio", item.audioStreams.compactMap { $0.summary() }),
+            ("Subtitles", item.subtitleNames()),
         ].filter { !$0.1.isEmpty }
         return Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 12, verticalSpacing: 4)
         {
@@ -145,6 +151,7 @@ struct MediaItemView: View {
                 GridRow {
                     Text(label).foregroundStyle(.secondary)
                     Text(values.joined(separator: Self.listSeparator))
+                        .frame(maxWidth: Self.textWidth, alignment: .leading)
                 }
             }
         }

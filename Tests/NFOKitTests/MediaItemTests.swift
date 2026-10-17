@@ -139,3 +139,22 @@ private func item(_ name: String) throws -> MediaItem {
     // Marks only set the direction of neutral characters and cannot carry past a field.
     #expect(movie.plot == "שלום \u{200F}world")
 }
+
+@Test func readsStreamDetails() throws {
+    let movie = try item("radarr-movie.nfo")
+    #expect(
+        movie.video
+            == VideoStream(codec: "HEVC", width: 3840, height: 2160, hdrType: "dolbyvision"))
+    #expect(
+        movie.audioStreams
+            == [AudioStream(codec: "TrueHD Atmos", channels: 8, language: "engengeng")])
+    #expect(movie.subtitleLanguages.count == 49)
+    #expect(movie.subtitleLanguages.prefix(4) == ["eng", "eng", "alb", "ara"])
+}
+
+@Test func leavesStreamDetailsEmptyWithoutFileInfo() throws {
+    let show = try item("sonarr-tvshow.nfo")
+    #expect(show.video == nil)
+    #expect(show.audioStreams.isEmpty)
+    #expect(show.subtitleLanguages.isEmpty)
+}

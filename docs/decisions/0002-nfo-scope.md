@@ -24,7 +24,9 @@ is a scene NFO, decoded as UTF-8 when valid and CP437 otherwise. `.diz` files ar
 
 - **XML** with a Kodi root (`movie`, `tvshow`, `episodedetails` — possibly several per file,
   `musicvideo`, `album`, `artist`) shows as an info card: artwork, title and year, plot, ratings,
-  runtime, genres, cast, and show/season/episode for episodes. **View → Show Raw** (⌥⌘U) switches
+  runtime, genres, cast, show/season/episode for episodes, and the `<streamdetails>` that Kodi
+  and the managers read from the media file: resolution, video codec and HDR type, each audio
+  stream's codec, channels and language, and the subtitle languages. **View → Show Raw** (⌥⌘U) switches
   to the XML text. Any other XML root opens in the raw view.
 - **Artwork is local only:** `<name>-poster.*`, `poster.*`, `folder.*` or `cover.*` (`.jpg`,
   `.jpeg` or `.png`) beside the NFO. With none, the card has no image and leaves no space for
