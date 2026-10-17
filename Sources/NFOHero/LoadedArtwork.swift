@@ -2,6 +2,7 @@ import CoreGraphics
 import Foundation
 import ImageIO
 import NFOKit
+import UniformTypeIdentifiers
 import os
 
 /// The poster and fanart beside an NFO, decoded and downsampled for display.
@@ -10,6 +11,12 @@ struct LoadedArtwork: Sendable {
     var fanart: CGImage?
 
     static let none = LoadedArtwork()
+
+    /// ImageIO decodes by content, not by extension, so a downloaded poster.jpg could reach any of
+    /// its decoders. Artwork only looks for these two, and anything else is not a real poster.
+    private static let decodableTypes: Set<String> = [
+        UTType.jpeg.identifier, UTType.png.identifier,
+    ]
 
     private static let logger: Logger = {
         guard let subsystem = Bundle.main.bundleIdentifier else {
@@ -47,8 +54,17 @@ struct LoadedArtwork: Sendable {
             kCGImageSourceCreateThumbnailWithTransform: true,
             kCGImageSourceThumbnailMaxPixelSize: maxPixels,
         ]
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-            let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else {
+            logger.error("Could not read \(url.path, privacy: .public)")
+            return nil
+        }
+        // CGImageSourceCreateWithURL only reads enough to tell the type; decoding happens below.
+        guard let type = CGImageSourceGetType(source) as String?, decodableTypes.contains(type)
+        else {
+            logger.error("Not a JPEG or PNG: \(url.path, privacy: .public)")
+            return nil
+        }
+        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
         else {
             logger.error("Could not decode \(url.path, privacy: .public)")
             return nil
