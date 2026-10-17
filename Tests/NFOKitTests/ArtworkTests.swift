@@ -18,35 +18,35 @@ private func folder(with files: [String], _ body: (URL) throws -> Void) throws {
 
 @Test func findsPosterAndFanartInARadarrFolder() throws {
     try folder(with: ["poster.jpg", "fanart.jpg"]) { nfo throws in
-        #expect(try Artwork.poster(nextTo: nfo)?.lastPathComponent == "poster.jpg")
-        #expect(try Artwork.fanart(nextTo: nfo)?.lastPathComponent == "fanart.jpg")
+        #expect(try Artwork(nextTo: nfo).poster?.lastPathComponent == "poster.jpg")
+        #expect(try Artwork(nextTo: nfo).fanart?.lastPathComponent == "fanart.jpg")
     }
 }
 
 @Test func prefersThePosterNamedAfterTheNFO() throws {
     try folder(with: ["cover.jpg", "folder.jpg", "poster.png", "\(nfoName)-poster.jpg"]) {
         nfo throws in
-        #expect(try Artwork.poster(nextTo: nfo)?.lastPathComponent == "\(nfoName)-poster.jpg")
+        #expect(try Artwork(nextTo: nfo).poster?.lastPathComponent == "\(nfoName)-poster.jpg")
     }
 }
 
 @Test func prefersPosterThenFolderThenCover() throws {
     try folder(with: ["cover.jpg", "folder.jpg", "poster.png"]) { nfo throws in
-        #expect(try Artwork.poster(nextTo: nfo)?.lastPathComponent == "poster.png")
+        #expect(try Artwork(nextTo: nfo).poster?.lastPathComponent == "poster.png")
     }
     try folder(with: ["cover.jpg", "folder.jpg"]) { nfo throws in
-        #expect(try Artwork.poster(nextTo: nfo)?.lastPathComponent == "folder.jpg")
+        #expect(try Artwork(nextTo: nfo).poster?.lastPathComponent == "folder.jpg")
     }
     try folder(with: ["cover.jpeg"]) { nfo throws in
-        #expect(try Artwork.poster(nextTo: nfo)?.lastPathComponent == "cover.jpeg")
+        #expect(try Artwork(nextTo: nfo).poster?.lastPathComponent == "cover.jpeg")
     }
 }
 
 @Test func matchesNamesIgnoringCase() throws {
     try folder(with: ["Folder.JPG", "\(nfoName.uppercased())-FANART.PNG"]) { nfo throws in
-        #expect(try Artwork.poster(nextTo: nfo)?.lastPathComponent == "Folder.JPG")
+        #expect(try Artwork(nextTo: nfo).poster?.lastPathComponent == "Folder.JPG")
         #expect(
-            try Artwork.fanart(nextTo: nfo)?.lastPathComponent
+            try Artwork(nextTo: nfo).fanart?.lastPathComponent
                 == "\(nfoName.uppercased())-FANART.PNG"
         )
     }
@@ -54,18 +54,18 @@ private func folder(with files: [String], _ body: (URL) throws -> Void) throws {
 
 @Test func returnsNilWithoutArtwork() throws {
     try folder(with: ["poster.webp", "banner.jpg"]) { nfo throws in
-        #expect(try Artwork.poster(nextTo: nfo) == nil)
-        #expect(try Artwork.fanart(nextTo: nfo) == nil)
+        #expect(try Artwork(nextTo: nfo).poster == nil)
+        #expect(try Artwork(nextTo: nfo).fanart == nil)
     }
 }
 
 @Test func throwsWhenTheFolderIsMissing() {
     let nfo = URL(fileURLWithPath: "/nonexistent-\(UUID().uuidString)/movie.nfo")
-    #expect(throws: (any Error).self) { try Artwork.poster(nextTo: nfo) }
+    #expect(throws: (any Error).self) { try Artwork(nextTo: nfo) }
 }
 
 @Test func prefersTheFanartNamedAfterTheNFO() throws {
     try folder(with: ["fanart.jpg", "\(nfoName)-fanart.png"]) { nfo throws in
-        #expect(try Artwork.fanart(nextTo: nfo)?.lastPathComponent == "\(nfoName)-fanart.png")
+        #expect(try Artwork(nextTo: nfo).fanart?.lastPathComponent == "\(nfoName)-fanart.png")
     }
 }

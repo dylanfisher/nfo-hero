@@ -27,26 +27,21 @@ struct LoadedArtwork: Sendable {
     /// shows them.
     static func load(nextTo nfoURL: URL) async -> LoadedArtwork {
         await Task.detached(priority: .userInitiated) {
-            LoadedArtwork(
-                poster: image(
-                    named: "poster", at: { try Artwork.poster(nextTo: nfoURL) }, maxPixels: 1200),
-                fanart: image(
-                    named: "fanart", at: { try Artwork.fanart(nextTo: nfoURL) }, maxPixels: 640)
+            let artwork: Artwork
+            do {
+                artwork = try Artwork(nextTo: nfoURL)
+            } catch {
+                logger.error("Could not look for artwork: \(error, privacy: .public)")
+                return .none
+            }
+            return LoadedArtwork(
+                poster: artwork.poster.flatMap { image(at: $0, maxPixels: 1200) },
+                fanart: artwork.fanart.flatMap { image(at: $0, maxPixels: 640) }
             )
         }.value
     }
 
-    private static func image(named name: String, at find: () throws -> URL?, maxPixels: Int)
-        -> CGImage?
-    {
-        let url: URL
-        do {
-            guard let found = try find() else { return nil }
-            url = found
-        } catch {
-            logger.error("Could not look for \(name, privacy: .public): \(error, privacy: .public)")
-            return nil
-        }
+    private static func image(at url: URL, maxPixels: Int) -> CGImage? {
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
