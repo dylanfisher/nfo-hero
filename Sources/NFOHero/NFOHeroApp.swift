@@ -4,7 +4,10 @@ import SwiftUI
 struct NFOHeroApp: App {
     var body: some Scene {
         DocumentGroup(viewing: NFODocument.self) { file in
-            NFOTextView(text: file.document.text)
+            NFODocumentView(nfo: file.document.nfo, fileURL: file.fileURL)
+        }
+        .commands {
+            ShowRawCommands()
         }
     }
 }
