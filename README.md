@@ -6,8 +6,9 @@ It opens both kinds of `.nfo`: the XML that Kodi, Radarr, Sonarr and Jellyfin wr
 media, shown as an info card with the folder's `poster.jpg` and the file's video, audio and
 subtitle streams, and release NFOs with their DOS ASCII art intact and their BBCode drawn as bold
 and colored text. **View → Text Encoding** picks UTF-8, DOS or Windows-1252 when the detected one
-is wrong. Press space on an NFO in Finder for the same view in Quick Look. It never writes to
-your files and makes no network calls.
+is wrong, and **View → Dark Text Background** draws the art light on dark. Press space on an NFO
+in Finder for the same view in Quick Look. It never writes to your files and makes no network
+calls.
 
 Requires macOS 15 or later.
 

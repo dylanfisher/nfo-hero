@@ -25,6 +25,7 @@ struct NFOHeroApp: App {
         .commands {
             ShowRawCommands()
             TextEncodingCommands()
+            DarkTextBackgroundCommands()
         }
     }
 }

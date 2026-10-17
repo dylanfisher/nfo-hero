@@ -12,6 +12,8 @@ struct NFOTextView: NSViewRepresentable {
     /// fits the whole text without scrolling, which sizes the window it opens in.
     var extent: TextExtent?
 
+    @AppStorage(DarkTextBackground.defaultsKey) private var darkBackground = false
+
     private static let lineFragmentPadding = NSTextContainer().lineFragmentPadding
 
     func makeNSView(context: Context) -> NSScrollView {
@@ -60,6 +62,8 @@ struct NFOTextView: NSViewRepresentable {
     }
 
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        // The text and BBCode colors are dynamic, so they follow the scroll view's appearance.
+        scrollView.appearance = darkBackground ? NSAppearance(named: .darkAqua) : nil
         let textView = scrollView.documentView as! NSTextView
         guard textView.string != text || context.coordinator.runs != runs else { return }
         // Through the text storage, because setting `string` gives all of the text the
