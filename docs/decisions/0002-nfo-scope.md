@@ -43,3 +43,10 @@ is a scene NFO, decoded as UTF-8 when valid and CP437 otherwise. `.diz` files ar
 
 Parsing and detection live in `NFOKit` and are tested against real files in
 `Tests/NFOKitTests/Fixtures/`. Plex is out of scope because it does not use NFOs.
+
+XML that fails to parse still opens: `NFO.parse` returns it with the `malformedXML` kind, which
+carries the parser's line, column and message, so the raw view can say why there is no card. A
+file that starts with `<` but is not UTF-8 throws instead, because there is no text to show.
+Before parsing, `<?xml ...?>` declarations are removed, anything after the last `>` (Kodi's
+optional scraper URL line) is dropped, and the rest is wrapped in a synthetic root so files with
+several root elements parse. Artwork lookup also accepts `.jpeg`.

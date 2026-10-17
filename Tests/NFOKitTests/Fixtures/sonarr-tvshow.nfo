@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<tvshow>
+  <title>The Expanse</title>
+  <rating>8.5</rating>
+  <year />
+  <plot>Hundreds of years in the future, humanity has colonized the solar system.</plot>
+  <mpaa>TV-14</mpaa>
+  <genre>Drama</genre>
+  <genre>Science Fiction</genre>
+  <premiered>2015-12-14</premiered>
+  <studio>Syfy</studio>
+  <studio>Amazon</studio>
+  <actor>
+    <name>Steven Strait</name>
+    <role>James Holden</role>
+  </actor>
+  <actor>
+    <name>Dominique Tipper</name>
+  </actor>
+</tvshow>
