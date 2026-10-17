@@ -2,15 +2,8 @@ import Foundation
 import NFOKit
 import Testing
 
-private struct NotMediaError: Error {
-    let kind: NFO.Kind
-}
-
 private func item(_ name: String) throws -> MediaItem {
-    let url = try #require(Bundle.module.url(forResource: "Fixtures/\(name)", withExtension: nil))
-    let kind = try NFO.parse(Data(contentsOf: url)).kind
-    guard case .media(let items) = kind else { throw NotMediaError(kind: kind) }
-    return try #require(items.first)
+    try #require(NFO.fixture(name).mediaItems().first)
 }
 
 @Test func readsARadarrMovie() throws {
@@ -100,10 +93,7 @@ private func item(_ name: String) throws -> MediaItem {
         <album><outline>Short.</outline>\
         <albumArtistCredits><artist>Radiohead</artist></albumArtistCredits></album>
         """
-    guard case .media(let items) = try NFO.parse(Data(xml.utf8)).kind else {
-        Issue.record("expected media")
-        return
-    }
-    #expect(items.first?.plot == "Short.")
-    #expect(items.first?.artists == ["Radiohead"])
+    let album = try #require(NFO.parse(Data(xml.utf8)).mediaItems().first)
+    #expect(album.plot == "Short.")
+    #expect(album.artists == ["Radiohead"])
 }
