@@ -63,3 +63,9 @@ private func folder(with files: [String], _ body: (URL) throws -> Void) throws {
     let nfo = URL(fileURLWithPath: "/nonexistent-\(UUID().uuidString)/movie.nfo")
     #expect(throws: (any Error).self) { try Artwork.poster(nextTo: nfo) }
 }
+
+@Test func prefersTheFanartNamedAfterTheNFO() throws {
+    try folder(with: ["fanart.jpg", "\(nfoName)-fanart.png"]) { nfo throws in
+        #expect(try Artwork.fanart(nextTo: nfo)?.lastPathComponent == "\(nfoName)-fanart.png")
+    }
+}

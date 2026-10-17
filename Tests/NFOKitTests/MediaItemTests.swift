@@ -97,3 +97,32 @@ private func item(_ name: String) throws -> MediaItem {
     #expect(album.plot == "Short.")
     #expect(album.artists == ["Radiohead"])
 }
+
+@Test func picksTheFirstRatingWhenNoneIsTheDefault() throws {
+    let xml = """
+        <movie><ratings>\
+        <rating name="imdb"><value>8.2</value></rating>\
+        <rating name="themoviedb" max="10"><value>7.9</value></rating>\
+        </ratings></movie>
+        """
+    let movie = try #require(NFO.parse(Data(xml.utf8)).mediaItems().first)
+    #expect(movie.primaryRating?.name == "imdb")
+}
+
+@Test func skipsRatingsWithoutANumericValue() throws {
+    let xml = """
+        <movie><ratings>\
+        <rating name="imdb"><value /></rating>\
+        <rating name="themoviedb"><value>n/a</value></rating>\
+        <rating name="trakt"><value>7.5</value></rating>\
+        </ratings></movie>
+        """
+    let movie = try #require(NFO.parse(Data(xml.utf8)).mediaItems().first)
+    #expect(movie.ratings.map(\.name) == ["trakt"])
+}
+
+@Test func readsTextInsideCDATA() throws {
+    let xml = "<movie><plot><![CDATA[Dinosaurs & <chaos>.]]></plot></movie>"
+    let movie = try #require(NFO.parse(Data(xml.utf8)).mediaItems().first)
+    #expect(movie.plot == "Dinosaurs & <chaos>.")
+}
