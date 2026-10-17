@@ -21,8 +21,15 @@ final class XMLTreeBuilder: NSObject, XMLParserDelegate {
     /// `<episodedetails>` roots, each of which may carry its own `<?xml ...?>` declaration, and
     /// Kodi allows a scraper URL on a line after the XML. So declarations are removed, anything
     /// after the last `>` is dropped, and the rest is wrapped in a synthetic root.
+    ///
+    /// The wrapping also rejects every `<!DOCTYPE>`: it ends up inside the root, where XML does
+    /// not allow one, so a file can declare no entities. That rules out exponential entity
+    /// expansion and external entities that read local files or fetch URLs. Kodi NFOs never
+    /// have a DOCTYPE.
     static func roots(of text: String) throws(XMLParseError) -> [XMLTreeElement] {
         let parser = XMLParser(data: wrappedBody(of: text))
+        // The default, set in case the DOCTYPE rejection above ever goes away.
+        parser.shouldResolveExternalEntities = false
         let builder = XMLTreeBuilder()
         parser.delegate = builder
         guard parser.parse(), let root = builder.root else {
