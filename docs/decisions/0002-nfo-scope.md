@@ -51,3 +51,9 @@ file that starts with `<` but is not UTF-8 throws instead, because there is no t
 Before parsing, `<?xml ...?>` declarations are removed, anything after the last `>` (Kodi's
 optional scraper URL line) is dropped, and the rest is wrapped in a synthetic root so files with
 several root elements parse.
+
+The files are untrusted downloads, so parsing is bounded. The synthetic root also rejects any
+`<!DOCTYPE>`, which Kodi NFOs never have, so a file cannot declare entities. Files over 16 MB throw
+`FileTooLargeError`. XML nested more than 256 deep is reported as malformed, because freeing a
+deeper tree overflowed the stack. A card lists the first 100 cast members and says how many more
+Show Raw has. Card text drops bidi override and isolate controls; the raw view keeps them.
