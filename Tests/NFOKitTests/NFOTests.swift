@@ -100,3 +100,10 @@ import Testing
         """
     _ = try NFO.parse(Data(text.utf8)).parseError()
 }
+
+@Test func rejectsFilesOverTheSizeLimit() throws {
+    let tooLarge = Data(repeating: UInt8(ascii: "A"), count: NFO.maxFileSize + 1)
+    let error = #expect(throws: NFO.FileTooLargeError.self) { try NFO.parse(tooLarge) }
+    #expect(error?.size == NFO.maxFileSize + 1)
+    #expect(try NFO.parse(tooLarge.dropLast()).kind == .scene)
+}

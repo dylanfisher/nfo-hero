@@ -17,6 +17,24 @@ public struct NFO: Sendable, Equatable {
     /// Thrown when a file that starts with `<` is not valid UTF-8. Kodi XML is always UTF-8.
     public struct InvalidUTF8Error: Error, Sendable, Equatable {}
 
+    /// Thrown for a file larger than ``maxFileSize``.
+    public struct FileTooLargeError: LocalizedError, Sendable, Equatable {
+        /// Bytes.
+        public let size: Int
+
+        public var errorDescription: String? {
+            let size = ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file)
+            let limit = ByteCountFormatter.string(
+                fromByteCount: Int64(NFO.maxFileSize), countStyle: .file)
+            return "The file is \(size), and NFO Hero opens files up to \(limit)."
+        }
+    }
+
+    /// The largest file ``parse(_:)`` accepts, in bytes. NFOs are kilobytes. A file of hundreds
+    /// of megabytes is not one, and decoding and laying it out takes several times its size in
+    /// memory and minutes of CPU.
+    public static let maxFileSize = 16_000_000
+
     /// The decoded file, without a UTF-8 BOM. For XML this is the source, including anything
     /// after the last element.
     public let text: String
@@ -29,6 +47,7 @@ public struct NFO: Sendable, Equatable {
     ///
     /// Malformed XML does not throw; it comes back as ``Kind/malformedXML(_:)``.
     public static func parse(_ data: Data) throws -> NFO {
+        guard data.count <= maxFileSize else { throw FileTooLargeError(size: data.count) }
         let body = data.starts(with: byteOrderMark) ? Data(data.dropFirst(3)) : data
         let firstCharacter = body.first { !isASCIIWhitespace($0) }
 
