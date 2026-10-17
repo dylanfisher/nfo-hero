@@ -19,4 +19,15 @@ extension MediaItem {
         guard let season, let episode else { return nil }
         return String(format: "S%02dE%02d", season, episode)
     }
+
+    /// How many cast members a card lists. Each one is a grid row, and laying out the rows blocks
+    /// the main thread: 2,000 took over a second and 25,000 over a minute. Show Raw still has
+    /// every one.
+    public static let castLimit = 100
+
+    /// The first ``castLimit`` members of ``cast``.
+    public var listedCast: ArraySlice<CastMember> { cast.prefix(Self.castLimit) }
+
+    /// How many members of ``cast`` are past ``castLimit``.
+    public var unlistedCastCount: Int { cast.count - listedCast.count }
 }

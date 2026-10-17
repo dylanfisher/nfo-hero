@@ -35,3 +35,21 @@ private func item(season: Int?, episode: Int?) -> MediaItem {
     #expect(item(season: 1, episode: nil).episodeCode == nil)
     #expect(item(season: nil, episode: 2).episodeCode == nil)
 }
+
+private func item(castCount: Int) -> MediaItem {
+    var item = MediaItem(kind: .movie)
+    item.cast = (0..<castCount).map { CastMember(name: "Actor \($0)", role: nil) }
+    return item
+}
+
+@Test func listsTheWholeCastUpToTheLimit() {
+    let movie = item(castCount: MediaItem.castLimit)
+    #expect(movie.listedCast == movie.cast[...])
+    #expect(movie.unlistedCastCount == 0)
+}
+
+@Test func countsTheCastPastTheLimit() {
+    let movie = item(castCount: 25_000)
+    #expect(movie.listedCast == movie.cast.prefix(MediaItem.castLimit))
+    #expect(movie.unlistedCastCount == 25_000 - MediaItem.castLimit)
+}

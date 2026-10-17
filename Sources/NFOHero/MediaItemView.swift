@@ -119,13 +119,17 @@ struct MediaItemView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Cast").font(.headline)
             Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 12, verticalSpacing: 4) {
-                ForEach(item.cast.indices, id: \.self) { index in
+                ForEach(item.listedCast.indices, id: \.self) { index in
                     let member = item.cast[index]
                     GridRow {
                         Text(member.name)
                         Text(member.role ?? "").foregroundStyle(.secondary)
                     }
                 }
+            }
+            if item.unlistedCastCount > 0 {
+                Text("and \(item.unlistedCastCount.formatted()) more, listed in View → Show Raw")
+                    .foregroundStyle(.secondary)
             }
         }
     }
