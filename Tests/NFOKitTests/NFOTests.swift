@@ -85,3 +85,18 @@ import Testing
     #expect(try NFO.parse(Data(text.utf8)).parseError().message.contains("nested"))
 }
 
+// A DOCTYPE ends up inside the synthetic root, where XML does not allow one, so entity
+// declarations never take effect: no exponential expansion and no external reads.
+@Test func rejectsDocumentTypeDeclarations() throws {
+    _ = try NFO.fixture("billion-laughs.nfo").parseError()
+
+    let secret = FileManager.default.temporaryDirectory
+        .appendingPathComponent(UUID().uuidString)
+    try Data("secret".utf8).write(to: secret)
+    defer { try? FileManager.default.removeItem(at: secret) }
+    let text = """
+        <!DOCTYPE movie [<!ENTITY x SYSTEM "\(secret.absoluteString)">]>
+        <movie><title>&x;</title></movie>
+        """
+    _ = try NFO.parse(Data(text.utf8)).parseError()
+}
