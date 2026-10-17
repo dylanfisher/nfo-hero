@@ -4,23 +4,21 @@ import SwiftUI
 /// The info card for one movie, show, episode, music video, album or artist.
 struct MediaItemView: View {
     let item: MediaItem
-    /// Nil when the folder has no poster; the card then has no image and no placeholder.
-    let poster: CGImage?
+    /// Absent when the folder has no poster; the card then has no image and no placeholder.
+    let poster: LoadedArtwork.Slot
 
     /// Between the facts on one line, such as rating, runtime and genres.
     private static let factSeparator = "  ·  "
     /// Between the names in one fact, such as genres or directors.
     private static let listSeparator = ", "
 
+    private static let posterWidth: CGFloat = 200
+    private static let posterShape = RoundedRectangle(cornerRadius: 6)
+
     var body: some View {
         HStack(alignment: .top, spacing: 24) {
-            if let poster {
-                Image(decorative: poster, scale: 1)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .shadow(radius: 4, y: 2)
+            if poster != .absent {
+                posterImage
             }
             VStack(alignment: .leading, spacing: 14) {
                 header
@@ -46,6 +44,41 @@ struct MediaItemView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .textSelection(.enabled)
+    }
+
+    /// The frame is set from the kind's aspect ratio before the image is decoded, so the card does
+    /// not move when it arrives. An image of another shape fits inside the frame, at the top,
+    /// rather than being cropped: square album art in a 2:3 frame would lose a third of its width.
+    /// A poster that fails to decode keeps its frame, so the text does not jump left after it had
+    /// been laid out beside the placeholder.
+    private var posterImage: some View {
+        ZStack(alignment: .top) {
+            switch poster {
+            case .absent, .decoding, .failed:
+                Self.posterShape
+                    .fill(.quaternary)
+                    .overlay {
+                        Image(
+                            systemName: poster == .failed ? "photo.badge.exclamationmark" : "photo"
+                        )
+                        .font(.largeTitle)
+                        .foregroundStyle(.tertiary)
+                    }
+                    .transition(.opacity)
+            case .decoded(let image):
+                Image(decorative: image, scale: 1)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(Self.posterShape)
+                    .shadow(radius: 4, y: 2)
+                    .transition(.opacity)
+            }
+        }
+        .frame(
+            width: Self.posterWidth, height: Self.posterWidth / item.posterAspectRatio,
+            alignment: .top
+        )
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder private var header: some View {

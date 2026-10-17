@@ -9,11 +9,22 @@ struct MediaView: View {
     let fileURL: URL?
 
     @SceneStorage("showRaw") private var showRaw = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // State as a plain property rather than `@State`: in the macOS 27 SDK `@State` is a macro
     // whose plugin ships only with Xcode, so it does not build with the Command Line Tools.
     // SwiftUI finds `State` properties by reflection, so this keeps its value across updates.
-    private let loaded = State(initialValue: LoadedArtwork.none)
-    private var artwork: LoadedArtwork { loaded.wrappedValue }
+    private let loaded: State<LoadedArtwork?>
+    private var artwork: LoadedArtwork? { loaded.wrappedValue }
+
+    init(items: [MediaItem], text: String, fileURL: URL?) {
+        self.items = items
+        self.text = text
+        self.fileURL = fileURL
+        // Found here rather than in the task below so the first layout already holds the poster's
+        // space, and the card does not move when the poster is decoded. SwiftUI keeps the first
+        // value and ignores the ones from later inits.
+        loaded = State(initialValue: fileURL.map(LoadedArtwork.find(nextTo:)))
+    }
 
     var body: some View {
         Group {
@@ -26,7 +37,16 @@ struct MediaView: View {
         .focusedSceneValue(\.showRaw, ShowRawToggle($showRaw))
         .task(id: fileURL) {
             guard let fileURL else { return }
-            loaded.wrappedValue = await LoadedArtwork.load(nextTo: fileURL)
+            var found = artwork
+            // The window's file was moved since the view was made.
+            if found?.nfoURL != fileURL {
+                found = LoadedArtwork.find(nextTo: fileURL)
+                loaded.wrappedValue = found
+            }
+            guard let decoded = await found?.decoded(), !Task.isCancelled else { return }
+            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) {
+                loaded.wrappedValue = decoded
+            }
         }
     }
 
@@ -36,14 +56,14 @@ struct MediaView: View {
             LazyVStack(alignment: .leading, spacing: 32) {
                 ForEach(items.indices, id: \.self) { index in
                     if index > 0 { Divider() }
-                    MediaItemView(item: items[index], poster: artwork.poster)
+                    MediaItemView(item: items[index], poster: artwork?.poster ?? .absent)
                 }
             }
             .padding(24)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(alignment: .top) {
-            if let fanart = artwork.fanart {
+            if case .decoded(let fanart) = artwork?.fanart {
                 // Downsampled and faded so it tints the window without competing with the text.
                 Image(decorative: fanart, scale: 1)
                     .resizable()
@@ -55,6 +75,7 @@ struct MediaView: View {
                     )
                     .ignoresSafeArea()
                     .accessibilityHidden(true)
+                    .transition(.opacity)
             }
         }
     }
